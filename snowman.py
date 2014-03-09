@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+SoftwareDesign HW6 - Video Game
+Olin Snowman: A game for protecting Olin Snowman from Babsoners!
+
 Created on Fri Mar  7 20:18:57 2014
 
 @author:
@@ -8,11 +11,19 @@ Created on Fri Mar  7 20:18:57 2014
     Inseong Joe
 """
 
+############################################################################
+# Imports
+############################################################################
+
 import pygame
 from pygame.locals import *
 import random
 import math
 import time
+
+############################################################################
+# Model Classes
+############################################################################
 
 class SnowManModel:
     """ """
@@ -32,7 +43,7 @@ class SnowManModel:
         pass
 
 class SnowMan:
-    """Encodes state of snowman"""
+    """ Encodes state of snowman """
     def __init__(self, width, height, x, y, vx, lives):
         #inputs:
         self.width = width
@@ -43,7 +54,7 @@ class SnowMan:
         self.lives = lives #number of lives
 
 class Babsoner:
-    """Encodes state of babsoner"""
+    """ Encodes state of babsoner """
     def __init__(self, width, height, x, y, color, vy, is_visible):
         self.width = width
         self.height = height
@@ -53,12 +64,16 @@ class Babsoner:
         self.vy = vy
         self.is_visible = is_visible
 
+############################################################################
+# View Classes
+############################################################################
+
 class SnowManView:
     """ A view of brick breaker rendered in a Pygame window """
     def __init__(self, model,screen):
         self.model = model
         self.screen = screen
-        
+
     def draw(self):
         #Filling Background Color
         self.screen.fill(pygame.Color(211,242,241))
@@ -80,7 +95,11 @@ class SnowManView:
         snowman_image.rect.y = image.y
         screen.blit(snowman_image, snowman_imagerect)
         pygame.display.flip()
-        
+
+############################################################################
+# Controller Classes
+############################################################################
+
 class SnowManMouseController:
     """ """
     def __init__(self):
@@ -98,3 +117,10 @@ class SnowManCollisionController:
     """ """
     def __init__(self):
         pass
+
+############################################################################
+# Main
+############################################################################
+
+if __name__ == "__main__":
+    pass
