@@ -35,8 +35,8 @@ import sys, traceback
 g_screen_width = 640
 g_screen_height = 480
 
-g_snowman_width = 80
-g_snowman_height = 100
+g_snowman_width = 60
+g_snowman_height = 120
 
 g_babsoner_width = 70
 g_babsoner_height = 50
@@ -110,7 +110,7 @@ class SnowMan:
         print "============="
 
 class Babsoner:
-    """Encodes state of babsoner"""
+    """ Encodes state of babsoner """
     def __init__(self, width, height, x, y, vy, is_visible):
         self.width = width
         self.height = height
