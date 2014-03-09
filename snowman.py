@@ -197,6 +197,16 @@ class SnowManCollisionController:
         pass
 
 ############################################################################
+# Add Music
+############################################################################
+
+def play_music(loop,start):
+    pygame.mixer.music.play(loop,start)
+
+def stop_music():
+    pygame.mixer.music.stop()
+    
+############################################################################
 # Main
 ############################################################################
 
@@ -217,9 +227,16 @@ if __name__ == "__main__":
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 1000)
+    
+    #load music
+    pygame.mixer.music.load('Theme Songs - James Bond  007 (Original).mp3')
+    
+    #set music volume
+    pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
 
     # Running loop
     running = True
+    play_music(-1,0.0)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -239,3 +256,5 @@ if __name__ == "__main__":
         time.sleep(.001)
 
     pygame.quit()
+
+
