@@ -229,7 +229,7 @@ if __name__ == "__main__":
     pygame.time.set_timer(USEREVENT + 2, 1000)
     
     #load music
-    pygame.mixer.music.load('Theme Songs - James Bond  007 (Original).mp3')
+    pygame.mixer.music.load('jamesbond.mp3')
     
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
