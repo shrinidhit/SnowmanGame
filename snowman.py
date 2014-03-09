@@ -257,6 +257,13 @@ if __name__ == "__main__":
 
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+    
+    #load video
+    pygame.movie.Movie('use_wreckingball.mpeg')
+    
+    #skip movie to 'I came in like a wrecking ball' part - starting from 42sec
+    #pygame.movie.Movie.skip(41.5)
+    # BUT WOW PYGAME LIED TO ME -- THERE IS NO SUCH ATTRIBUTE
 
     # Running loop
     running = True
