@@ -37,6 +37,8 @@ g_screen_height = 480
 
 g_snowman_width = 60
 g_snowman_height = 120
+g_snowman_vx = 0
+g_snowman_lives = 5
 
 g_babsoner_width = 70
 g_babsoner_height = 50
@@ -44,6 +46,7 @@ g_babsoner_vy = 10
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
+g_level = 1
 
 ############################################################################
 # Model Classes
@@ -58,8 +61,8 @@ class SnowManModel:
                                g_snowman_height,
                                (g_screen_width / 2 - g_snowman_width / 2),
                                (g_screen_height - g_snowman_height),
-                               0,
-                               3)
+                               g_snowman_vx,
+                               g_snowman_lives)
         self.score = 0
         self.snowman.printAll()
 
@@ -83,7 +86,6 @@ class SnowManModel:
         babsoner.is_visible = 1
 
     def getScore(self, num_rmvd_babsoners):
-        self.score = num_rmvd_babsoners
         return self.score
 
     def update(self):
@@ -145,10 +147,10 @@ class SnowManView:
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
 
-        # Display lives and score
-        score = self.model.getScore(g_num_rmvd_babsoners)
+        # Display current information: lives, level and score
         font = pygame.font.Font(None, 36)
-        text = font.render("Lives: %d / Score: %d" % (model.snowman.lives, score), 1, (10, 10, 10))
+        text = font.render("Lives: %d / Level: %d / Score: %d" % (model.snowman.lives, g_level, self.model.score), \
+                           1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = g_screen_width / 2
         screen.blit(text, textpos)
@@ -197,6 +199,7 @@ class SnowManBabsonerController:
                 babsoner.is_visible = False
                 global g_num_rmvd_babsoners
                 g_num_rmvd_babsoners += 1
+                self.model.score += g_level
 
     def create(self):
         """ """
@@ -250,17 +253,18 @@ if __name__ == "__main__":
 
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
-    pygame.time.set_timer(USEREVENT + 2, 1000)
+    pygame.time.set_timer(USEREVENT + 2, 800)
+    pygame.time.set_timer(USEREVENT + 3, 10000)    # every 10 seconds
 
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
 
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
-    
+
     #load video
     pygame.movie.Movie('use_wreckingball.mpeg')
-    
+
     #skip movie to 'I came in like a wrecking ball' part - starting from 42sec
     #pygame.movie.Movie.skip(41.5)
     # BUT WOW PYGAME LIED TO ME -- THERE IS NO SUCH ATTRIBUTE
@@ -282,6 +286,11 @@ if __name__ == "__main__":
 
             if event.type == USEREVENT + 2:
                 controller_babsoner.create()
+
+            if event.type == USEREVENT + 3:
+                g_babsoner_vy += 2
+                g_level += 1
+                print "Speed UP!"
 
         view.draw()
         time.sleep(.001)
