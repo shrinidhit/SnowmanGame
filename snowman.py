@@ -46,6 +46,7 @@ class SnowManModel:
                                0,
                                3)
         self.score = 0
+        self.snowman.PrintAll()
 
     def CreateBabsoner(self,vy): #set velocity in controller
         a = random.randint(50,150) #sets random width of babsoner
@@ -73,6 +74,16 @@ class SnowMan:
         self.vx = vx #velocity in x direction
         self.lives = lives #number of lives
 
+    def PrintAll(self):
+        print "== Snowman =="
+        print "width:", self.width
+        print "height:", self.height
+        print "x:", self.x
+        print "y:", self.y
+        print "vx:", self.vx
+        print "lives:", self.lives
+        print "============="
+
 class Babsoner:
     """Encodes state of babsoner"""
     def __init__(self, width, height, x, y, vy, is_visible):
@@ -93,6 +104,9 @@ class SnowManView:
         self.model = model
         self.screen = screen
 
+        image = pygame.image.load("./snowman.png")
+        self.snowman_image = pygame.transform.scale(image, (self.model.snowman.width, self.model.snowman.height))
+
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
@@ -101,19 +115,15 @@ class SnowManView:
         for babsoner in self.model.babsoners:
             if babsoner.is_visible == 0:
                 image = pygame.image.load("babsoner.png")
-                pygame.transform.scale(image, (babsoner.width, babsoner.height)) #scales image to height and width
+                image = pygame.transform.scale(image, (babsoner.width, babsoner.height)) #scales image to height and width
                 image_rect = image.get_rect() #gets x and y coordinates of image
                 image_rect.x = image.x #moves image to x and y location input:
                 image_rect.y = image.y
                 screen.blit(image, image_rect)
                 pygame.display.flip()
-        #Displaying Snowman
-        image = pygame.image.load("snowman.png")
-        pygame.transform.scale(image, (self.model.snowman.width, self.model.snowman.height)) #scales image to height and width
-        image_rect = image.get_rect()
-        image_rect.x = model.snowman.x
-        image_rect.y = model.snowman.y
-        screen.blit(image, image_rect)
+
+        # Displaying Snowman
+        screen.blit(self.snowman_image, (model.snowman.x, model.snowman.y))
         pygame.display.flip()
 
 ############################################################################
@@ -126,7 +136,8 @@ class SnowManMouseController:
         self.model = model
 
     def HandleMouseEvent(self, event):
-        pass
+        if event.type == MOUSEMOTION:
+            self.model.snowman.x = event.pos[0] - (self.model.snowman.width / 2.0)
 
 class SnowManBabsonerController:
     """ """
