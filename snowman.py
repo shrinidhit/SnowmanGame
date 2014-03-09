@@ -98,9 +98,6 @@ class SnowMan:
         self.vx = vx
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load("./snowman.png"), (self.width, self.height))
-        # Make image transparent
-        alpha = 255
-        self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
     def printAll(self):
         print "== Snowman =="
