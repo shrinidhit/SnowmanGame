@@ -26,32 +26,43 @@ from pygame.locals import *
 import random
 import math
 import time
+import sys, traceback
+
+############################################################################
+# Global configurations
+############################################################################
+
+g_snowman_width = 60
+g_snowman_height = 80
+
+g_babsoner_width = 60
+g_babsoner_height = 30
+g_babsoner_vy = 5
 
 ############################################################################
 # Model Classes
 ############################################################################
-
-snowman_width = 60
-snowman_height = 80
 
 class SnowManModel:
     """ Encodes overall game state of Snowman game """
     def __init__(self):
         # initialize
         self.babsoners = []
-        self.snowman = SnowMan(snowman_width,
-                               snowman_height,
-                               (screen.get_width() / 2 - snowman_width / 2),
-                               (screen.get_height() - snowman_height),
+        self.snowman = SnowMan(g_snowman_width,
+                               g_snowman_height,
+                               (screen.get_width() / 2 - g_snowman_width / 2),
+                               (screen.get_height() - g_snowman_height),
                                0,
                                3)
         self.score = 0
         self.snowman.PrintAll()
 
-    def CreateBabsoner(self,vy): #set velocity in controller
-        a = random.randint(50,150) #sets random width of babsoner
-        babson = Babsoner(a,a*2,random.randint(a/2.0,640-a/2.0),0,vy,0)
-        self.babsoner.append(babson)
+    def CreateBabsoner(self, vy): #set velocity in controller
+        #a = random.randint(50, 150) #sets random width of babsoner
+        #babson = Babsoner(a, a * 2, random.randint(int(a / 2.0), int(640 - a /2.0)), 0, vy, 0)
+        babson = Babsoner(g_babsoner_width, g_babsoner_height, random.randint(100, 500), 0, g_babsoner_vy, True)
+        self.babsoners.append(babson)
+        print "Babsoner Created!"
 
     def RemoveBabsoner(self, babsoner):
         babsoner.is_visible = 1
@@ -94,6 +105,9 @@ class Babsoner:
         self.vy = vy
         self.is_visible = is_visible
         self.image = pygame.transform.scale(pygame.image.load("./babsoner.png"), (self.width, self.height))
+        # this works on images with per pixel alpha too
+        alpha = 255
+        self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
 ############################################################################
 # View Classes
@@ -111,9 +125,15 @@ class SnowManView:
 
         # Displaying Babsoners
         for babsoner in self.model.babsoners:
-            if babsoner.is_visible == 0:
-                screen.blit(babsoner.image, babsoner.x, babsoner.y)
-                pygame.display.flip()
+            if babsoner.is_visible == True:
+                #print "Babsoner Displayed!"
+                try:
+                    screen.blit(babsoner.image, (babsoner.x, babsoner.y))
+                except:
+                    print "x: %d / y: %d", (babsoner.x, babsoner.y)
+                    traceback.print_exc(file=sys.stdout)
+                    sys.exit(1)
+                #pygame.display.flip()
 
         # Displaying Snowman
         screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
@@ -137,10 +157,22 @@ class SnowManBabsonerController:
     def __init__(self, model):
         self.model = model
 
+    def update(self):
+        """ """
+        for babsoner in self.model.babsoners:
+            babsoner.y += babsoner.vy
+
+    def create(self):
+        """ """
+        self.model.CreateBabsoner(g_babsoner_vy)
+
 class SnowManCollisionController:
     """ """
     def __init__(self, model):
         self.model = model
+
+    def check(self):
+        pass
 
 ############################################################################
 # Main
@@ -158,6 +190,9 @@ if __name__ == "__main__":
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
 
+    pygame.time.set_timer(USEREVENT + 1, 50)
+    pygame.time.set_timer(USEREVENT + 2, 1000)
+
     running = True
 
     while running:
@@ -166,7 +201,11 @@ if __name__ == "__main__":
                 running = False
             if event.type == MOUSEMOTION:
                 controller_mouse.HandleMouseEvent(event)
-        #model.update()
+            if event.type == USEREVENT + 1:
+                controller_babsoner.update()
+                controller_collision.check()
+            if event.type == USEREVENT + 2:
+                controller_babsoner.create()
         view.draw()
         time.sleep(.001)
 
