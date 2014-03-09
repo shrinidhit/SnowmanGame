@@ -29,13 +29,13 @@ class SnowManModel:
     """Encodes overall game state of Snowman game"""
     def __init__(self):
         # initialize
-        self.snowman = SnowMan(200,100,screen_height,screen_width/2.0-50,0) # set screen_width
+        self.snowman = SnowMan(200,100,480,640/2.0-50,0) 
         self.babsoner = []
         self.score = 0
 
     def CreateBabsoner(self,vy): #set velocity in controller
-        a = random.randint(50,150)
-        babson = Babsoner(a,a*2,random.randint(a/2.0,screen_width-a/2.0),0,vy,0)
+        a = random.randint(50,150) #sets random width of babsoner
+        babson = Babsoner(a,a*2,random.randint(a/2.0,640-a/2.0),0,vy,0)
         self.babsoner.append(babson)
         
     def RemoveBabsoner(self, babsoner):
