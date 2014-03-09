@@ -79,7 +79,18 @@ class SnowManModel:
         else:
             for babsoner in self.babsoners:
                 if babsoner.is_visible == False:
-                    babsoner.reset(random.randint(0, g_screen_width - g_babsoner_width), 0, g_babsoner_vy)
+                    width = g_snowman_width
+                    height = g_snowman_height
+                    if g_level >= 3:
+                        r = random.randint(80, 100 + g_level * 2)
+                        if r > 100:
+                            width *= float(r / 100)
+                            height *= float(r / 100)
+                    babsoner.reset(width,
+                                   height,
+                                   random.randint(0, g_screen_width - g_babsoner_width),
+                                   0,
+                                   g_babsoner_vy)
                     break
 
     def removeBabsoner(self, babsoner):
@@ -127,7 +138,9 @@ class Babsoner:
         alpha = 255
         self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
-    def reset(self, x, y, vy):
+    def reset(self, width, height, x, y, vy):
+        self.width = width
+        self.height = height
         self.x = x
         self.y = y
         self.vy = vy
@@ -252,7 +265,7 @@ if __name__ == "__main__":
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 800)
-    pygame.time.set_timer(USEREVENT + 3, 10000)    # every 10 seconds
+    pygame.time.set_timer(USEREVENT + 3, 8000)    # every 8 seconds
 
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
