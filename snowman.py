@@ -66,13 +66,13 @@ class SnowManModel:
 class SnowMan:
     """ Encodes state of snowman """
     def __init__(self, width, height, x, y, vx, lives):
-        #inputs:
         self.width = width
         self.height = height
         self.x = x
         self.y = y
-        self.vx = vx #velocity in x direction
-        self.lives = lives #number of lives
+        self.vx = vx
+        self.lives = lives
+        self.image = pygame.transform.scale(pygame.image.load("./snowman.png"), (self.width, self.height))
 
     def PrintAll(self):
         print "== Snowman =="
@@ -93,6 +93,7 @@ class Babsoner:
         self.y = y
         self.vy = vy
         self.is_visible = is_visible
+        self.image = pygame.transform.scale(pygame.image.load("./babsoner.png"), (self.width, self.height))
 
 ############################################################################
 # View Classes
@@ -104,9 +105,6 @@ class SnowManView:
         self.model = model
         self.screen = screen
 
-        image = pygame.image.load("./snowman.png")
-        self.snowman_image = pygame.transform.scale(image, (self.model.snowman.width, self.model.snowman.height))
-
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
@@ -114,16 +112,11 @@ class SnowManView:
         # Displaying Babsoners
         for babsoner in self.model.babsoners:
             if babsoner.is_visible == 0:
-                image = pygame.image.load("babsoner.png")
-                image = pygame.transform.scale(image, (babsoner.width, babsoner.height)) #scales image to height and width
-                image_rect = image.get_rect() #gets x and y coordinates of image
-                image_rect.x = image.x #moves image to x and y location input:
-                image_rect.y = image.y
-                screen.blit(image, image_rect)
+                screen.blit(babsoner.image, babsoner.x, babsoner.y)
                 pygame.display.flip()
 
         # Displaying Snowman
-        screen.blit(self.snowman_image, (model.snowman.x, model.snowman.y))
+        screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
         pygame.display.flip()
 
 ############################################################################
@@ -171,7 +164,6 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-
             if event.type == MOUSEMOTION:
                 controller_mouse.HandleMouseEvent(event)
         #model.update()
