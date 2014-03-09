@@ -194,7 +194,17 @@ class SnowManCollisionController:
         self.model = model
 
     def check(self):
-        pass
+        """ Check collision between snowman and babsoner """
+        # Rect(left, top, width, height) -> Rect
+        # Rect((left, top), (width, height)) -> Rect
+        rect_snowman = pygame.Rect(model.snowman.x, model.snowman.y, model.snowman.width, model.snowman.height)
+        for babsoner in self.model.babsoners:
+            if babsoner.is_visible == True:
+                rect = pygame.Rect(babsoner.x, babsoner.y, babsoner.width, babsoner.height)
+                if rect.colliderect(rect_snowman):
+                    model.snowman.lives -= 1
+                    babsoner.is_visible = False
+                    print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
 ############################################################################
 # Add Music
@@ -205,7 +215,7 @@ def play_music(loop,start):
 
 def stop_music():
     pygame.mixer.music.stop()
-    
+
 ############################################################################
 # Main
 ############################################################################
@@ -227,10 +237,10 @@ if __name__ == "__main__":
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 1000)
-    
+
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
-    
+
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
 
@@ -254,6 +264,9 @@ if __name__ == "__main__":
 
         view.draw()
         time.sleep(.001)
+        if model.snowman.lives == 0:
+            running = False
+            # Add code for video here!
 
     pygame.quit()
 
