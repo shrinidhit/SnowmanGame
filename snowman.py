@@ -35,8 +35,8 @@ import sys, traceback
 g_screen_width = 640
 g_screen_height = 480
 
-g_snowman_width = 80
-g_snowman_height = 100
+g_snowman_width = 60
+g_snowman_height = 120
 
 g_babsoner_width = 70
 g_babsoner_height = 50
@@ -98,6 +98,9 @@ class SnowMan:
         self.vx = vx
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load("./snowman.png"), (self.width, self.height))
+        # Make image transparent
+        alpha = 255
+        self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
     def printAll(self):
         print "== Snowman =="
@@ -110,7 +113,7 @@ class SnowMan:
         print "============="
 
 class Babsoner:
-    """Encodes state of babsoner"""
+    """ Encodes state of babsoner """
     def __init__(self, width, height, x, y, vy, is_visible):
         self.width = width
         self.height = height
