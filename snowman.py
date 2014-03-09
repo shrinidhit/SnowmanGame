@@ -82,7 +82,7 @@ class SnowManModel:
     def removeBabsoner(self, babsoner):
         babsoner.is_visible = 1
 
-    def getScore(self, num_rmvd_babsoners, ellapsed_time):
+    def getScore(self, num_rmvd_babsoners):
         self.score = num_rmvd_babsoners
         return self.score
 
@@ -144,15 +144,15 @@ class SnowManView:
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
-        
-        # Display score
-        score = self.model.getScore(g_num_rmvd_babsoners, USEREVENT + 2)
+
+        # Display lives and score
+        score = self.model.getScore(g_num_rmvd_babsoners)
         font = pygame.font.Font(None, 36)
-        text = font.render("Score: " + str(score), 1, (10, 10, 10))
+        text = font.render("Lives: %d / Score: %d" % (model.snowman.lives, score), 1, (10, 10, 10))
         textpos = text.get_rect()
-        textpos.centerx = g_screen_width/2
+        textpos.centerx = g_screen_width / 2
         screen.blit(text, textpos)
-        
+
         # Displaying Snowman
         screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
 
@@ -283,5 +283,3 @@ if __name__ == "__main__":
             # Add code for video here!
 
     pygame.quit()
-
-
