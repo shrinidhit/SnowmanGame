@@ -29,15 +29,20 @@ import time
 import sys, traceback
 
 ############################################################################
-# Global configurations
+# Global variabless
 ############################################################################
 
-g_snowman_width = 60
-g_snowman_height = 80
+g_screen_width = 640
+g_screen_height = 480
 
-g_babsoner_width = 60
-g_babsoner_height = 30
-g_babsoner_vy = 5
+g_snowman_width = 80
+g_snowman_height = 100
+
+g_babsoner_width = 70
+g_babsoner_height = 50
+g_babsoner_vy = 10
+
+g_max_babsoner = 10
 
 ############################################################################
 # Model Classes
@@ -50,25 +55,34 @@ class SnowManModel:
         self.babsoners = []
         self.snowman = SnowMan(g_snowman_width,
                                g_snowman_height,
-                               (screen.get_width() / 2 - g_snowman_width / 2),
-                               (screen.get_height() - g_snowman_height),
+                               (g_screen_width / 2 - g_snowman_width / 2),
+                               (g_screen_height - g_snowman_height),
                                0,
                                3)
         self.score = 0
-        self.snowman.PrintAll()
+        self.snowman.printAll()
 
-    def CreateBabsoner(self, vy): #set velocity in controller
-        #a = random.randint(50, 150) #sets random width of babsoner
-        #babson = Babsoner(a, a * 2, random.randint(int(a / 2.0), int(640 - a /2.0)), 0, vy, 0)
-        babson = Babsoner(g_babsoner_width, g_babsoner_height, random.randint(100, 500), 0, g_babsoner_vy, True)
-        self.babsoners.append(babson)
-        print "Babsoner Created!"
+    def createBabsoner(self, vy):
+        if len(self.babsoners) < g_max_babsoner:
+            babson = Babsoner(g_babsoner_width,
+                              g_babsoner_height,
+                              random.randint(0, g_screen_width - g_babsoner_width),
+                              0,
+                              g_babsoner_vy,
+                              True)
+            self.babsoners.append(babson)
+            print "Babsoner Created! - %d" % (len(self.babsoners))
+        else:
+            for babsoner in self.babsoners:
+                if babsoner.is_visible == False:
+                    babsoner.reset(random.randint(0, g_screen_width - g_babsoner_width), 0, g_babsoner_vy)
+                    break
 
-    def RemoveBabsoner(self, babsoner):
+    def removeBabsoner(self, babsoner):
         babsoner.is_visible = 1
 
-    def GetScore(self,num_rmvd_babsoners, ellapsed_time):
-        self.score += num_rmvd_babsoners+ellapsed_time
+    def getScore(self, num_rmvd_babsoners, ellapsed_time):
+        self.score += num_rmvd_babsoners + ellapsed_time
 
     def update(self):
         self.snowman.update()
@@ -85,7 +99,7 @@ class SnowMan:
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load("./snowman.png"), (self.width, self.height))
 
-    def PrintAll(self):
+    def printAll(self):
         print "== Snowman =="
         print "width:", self.width
         print "height:", self.height
@@ -105,9 +119,15 @@ class Babsoner:
         self.vy = vy
         self.is_visible = is_visible
         self.image = pygame.transform.scale(pygame.image.load("./babsoner.png"), (self.width, self.height))
-        # this works on images with per pixel alpha too
+        # Make image transparent
         alpha = 255
         self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
+
+    def reset(self, x, y, vy):
+        self.x = x
+        self.y = y
+        self.vy = vy
+        self.is_visible = True
 
 ############################################################################
 # View Classes
@@ -133,7 +153,7 @@ class SnowManView:
                     print "x: %d / y: %d", (babsoner.x, babsoner.y)
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
-                #pygame.display.flip()
+                #pygame.display.flip()  # commented to remove blinking
 
         # Displaying Snowman
         screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
@@ -148,7 +168,7 @@ class SnowManMouseController:
     def __init__(self, model):
         self.model = model
 
-    def HandleMouseEvent(self, event):
+    def handleMouseEvent(self, event):
         if event.type == MOUSEMOTION:
             self.model.snowman.x = event.pos[0] - (self.model.snowman.width / 2.0)
 
@@ -161,10 +181,12 @@ class SnowManBabsonerController:
         """ """
         for babsoner in self.model.babsoners:
             babsoner.y += babsoner.vy
+            if babsoner.y > g_screen_height:
+                babsoner.is_visible = False
 
     def create(self):
         """ """
-        self.model.CreateBabsoner(g_babsoner_vy)
+        self.model.createBabsoner(g_babsoner_vy)
 
 class SnowManCollisionController:
     """ """
@@ -181,31 +203,38 @@ class SnowManCollisionController:
 if __name__ == "__main__":
     pygame.init()
 
-    size = (640, 480)
+    # Initialize screen
+    size = (g_screen_width, g_screen_height)
     screen = pygame.display.set_mode(size)
 
+    # MVC objects
     model = SnowManModel()
     view = SnowManView(model, screen)
     controller_mouse = SnowManMouseController(model)
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
 
+    # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 1000)
 
+    # Running loop
     running = True
-
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+
             if event.type == MOUSEMOTION:
-                controller_mouse.HandleMouseEvent(event)
+                controller_mouse.handleMouseEvent(event)
+
             if event.type == USEREVENT + 1:
                 controller_babsoner.update()
                 controller_collision.check()
+
             if event.type == USEREVENT + 2:
                 controller_babsoner.create()
+
         view.draw()
         time.sleep(.001)
 
