@@ -288,5 +288,9 @@ if __name__ == "__main__":
             running = False
             # Add code for video here!
             pygame.mixer.quit()
+            screen = pygame.display.set_mode(movie.get_size())
+            movie_screen = pygame.Surface(movie.get_size()).convert()
+            movie.set_display(movie_screen)
+            pygame.display.update()
             movie.play()
     pygame.quit()
