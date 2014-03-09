@@ -169,8 +169,6 @@ class SnowManView:
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
                 #pygame.display.flip()  # commented to remove blinking
-
-
         pygame.display.flip()
 
 ############################################################################
@@ -263,11 +261,10 @@ if __name__ == "__main__":
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
 
     #load video
-    pygame.movie.Movie('use_wreckingball.mpeg')
+    movie = pygame.movie.Movie('real_wreckingball.mpg')
 
-    #skip movie to 'I came in like a wrecking ball' part - starting from 42sec
-    #pygame.movie.Movie.skip(41.5)
-    # BUT WOW PYGAME LIED TO ME -- THERE IS NO SUCH ATTRIBUTE
+    #skip movie to 'I came in like a wrecking ball' part - starting from about 42sec
+    movie.skip(41.5)
 
     # Running loop
     running = True
@@ -297,5 +294,6 @@ if __name__ == "__main__":
         if model.snowman.lives == 0:
             running = False
             # Add code for video here!
-
+            pygame.mixer.quit()
+            movie.play()
     pygame.quit()
