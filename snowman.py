@@ -37,6 +37,8 @@ g_screen_height = 480
 
 g_snowman_width = 60
 g_snowman_height = 120
+g_snowman_vx = 0
+g_snowman_lives = 5
 
 g_babsoner_width = 70
 g_babsoner_height = 50
@@ -44,7 +46,11 @@ g_babsoner_vy = 10
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
+<<<<<<< HEAD
 g_time = 0
+=======
+g_level = 1
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
 
 ############################################################################
 # Model Classes
@@ -59,8 +65,8 @@ class SnowManModel:
                                g_snowman_height,
                                (g_screen_width / 2 - g_snowman_width / 2),
                                (g_screen_height - g_snowman_height),
-                               0,
-                               3)
+                               g_snowman_vx,
+                               g_snowman_lives)
         self.score = 0
         self.snowman.printAll()
 
@@ -83,8 +89,7 @@ class SnowManModel:
     def removeBabsoner(self, babsoner):
         babsoner.is_visible = 1
 
-    def getScore(self, num_rmvd_babsoners, ellapsed_time):
-        self.score = num_rmvd_babsoners
+    def getScore(self, num_rmvd_babsoners):
         return self.score
 
     def update(self):
@@ -145,15 +150,15 @@ class SnowManView:
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
-        
-        # Display score
-        score = self.model.getScore(g_num_rmvd_babsoners, USEREVENT + 2)
+
+        # Display current information: lives, level and score
         font = pygame.font.Font(None, 36)
-        text = font.render("Score: " + str(score), 1, (10, 10, 10))
+        text = font.render("Lives: %d / Level: %d / Score: %d" % (model.snowman.lives, g_level, self.model.score), \
+                           1, (10, 10, 10))
         textpos = text.get_rect()
-        textpos.centerx = g_screen_width/2
+        textpos.centerx = g_screen_width / 2
         screen.blit(text, textpos)
-        
+
         # Displaying Snowman
         screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
 
@@ -167,6 +172,7 @@ class SnowManView:
                     print "x: %d / y: %d", (babsoner.x, babsoner.y)
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
+<<<<<<< HEAD
         pygame.display.flip()
 
 class SnowManPreview:
@@ -196,6 +202,9 @@ class SnowManPreview:
         screen.blit(subtitle, subtextpos)
         
         #update
+=======
+                #pygame.display.flip()  # commented to remove blinking
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
         pygame.display.flip()
 ############################################################################
 # Controller Classes
@@ -223,6 +232,7 @@ class SnowManBabsonerController:
                 babsoner.is_visible = False
                 global g_num_rmvd_babsoners
                 g_num_rmvd_babsoners += 1
+                self.model.score += g_level
 
     def create(self):
         """ """
@@ -234,7 +244,17 @@ class SnowManCollisionController:
         self.model = model
 
     def check(self):
-        pass
+        """ Check collision between snowman and babsoner """
+        # Rect(left, top, width, height) -> Rect
+        # Rect((left, top), (width, height)) -> Rect
+        rect_snowman = pygame.Rect(model.snowman.x, model.snowman.y, model.snowman.width, model.snowman.height)
+        for babsoner in self.model.babsoners:
+            if babsoner.is_visible == True:
+                rect = pygame.Rect(babsoner.x, babsoner.y, babsoner.width, babsoner.height)
+                if rect.colliderect(rect_snowman):
+                    model.snowman.lives -= 1
+                    babsoner.is_visible = False
+                    print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
 ############################################################################
 # Add Music
@@ -245,7 +265,7 @@ def play_music(loop,start):
 
 def stop_music():
     pygame.mixer.music.stop()
-    
+
 ############################################################################
 # Main
 ############################################################################
@@ -267,13 +287,15 @@ if __name__ == "__main__":
 
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
-    pygame.time.set_timer(USEREVENT + 2, 1000)
-    
+    pygame.time.set_timer(USEREVENT + 2, 800)
+    pygame.time.set_timer(USEREVENT + 3, 10000)    # every 10 seconds
+
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
-    
+
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+<<<<<<< HEAD
                    
     # Running loop
     if time >5:
@@ -305,6 +327,43 @@ if __name__ == "__main__":
             if g_time>=5:
                 view.draw()
             time.sleep(.001)
+=======
+
+    #load video
+    movie = pygame.movie.Movie('real_wreckingball.mpg')
+
+    #skip movie to 'I came in like a wrecking ball' part - starting from about 42sec
+    movie.skip(41.5)
+
+    # Running loop
+    running = True
+    play_music(-1,0.0)
+    while running:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+
+            if event.type == MOUSEMOTION:
+                controller_mouse.handleMouseEvent(event)
+
+            if event.type == USEREVENT + 1:
+                controller_babsoner.update()
+                controller_collision.check()
+
+            if event.type == USEREVENT + 2:
+                controller_babsoner.create()
+
+            if event.type == USEREVENT + 3:
+                g_babsoner_vy += 2
+                g_level += 1
+                print "Speed UP!"
+
+        view.draw()
+        time.sleep(.001)
+        if model.snowman.lives == 0:
+            running = False
+            # Add code for video here!
+            pygame.mixer.quit()
+            movie.play()
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
     pygame.quit()
-
-
