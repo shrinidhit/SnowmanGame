@@ -22,24 +22,35 @@ class SnowManModel:
     def CreateSnowman(self, x, y):
         pass
 
-    def CreateSnowBall(self, radius, x, y):
+    def CreateBabsoner(self, radius, x, y):
         pass
 
-    def RemoveSnowball(self, Snowball):
+    def RemoveBabsoner(self, Babsoner):
         pass
 
-    def GetScore(self, num_snow_balls, ellapsed_time):
+    def GetScore(self, num_babsoners, ellapsed_time):
         pass
 
 class SnowMan:
-    """ """
+    """Encodes state of snowman"""
     def __init__(self):
-        pass
+        self.height = height
+        self.width = width 
+        self.x = x
+        self.y = y
+        self.vx = vx #velocity in x direction
+        self.lives = lives #number of lives
 
-class SnowBall:
-    """ """
+class Babsoner:
+    """Encodes state of babsoner"""
     def __init__(self):
-        pass
+        self.height = height
+        self.width = width
+        self.x = x
+        self.y = y
+        self.color = color
+        self.vy = vy
+        self.is_visible = is_visible
 
 class SnowManView:
     """ """
@@ -57,7 +68,7 @@ class SnowManMouseController:
     def HandleMouseEvent(self):
         pass
 
-class SnowManSnowBallController:
+class SnowManBabsonerController:
     """ """
     def __init__(self):
         pass
