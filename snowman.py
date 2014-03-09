@@ -37,6 +37,8 @@ g_screen_height = 480
 
 g_snowman_width = 60
 g_snowman_height = 120
+g_snowman_vx = 0
+g_snowman_lives = 5
 
 g_babsoner_width = 70
 g_babsoner_height = 50
@@ -44,6 +46,11 @@ g_babsoner_vy = 10
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
+<<<<<<< HEAD
+g_time = 0
+=======
+g_level = 1
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
 
 ############################################################################
 # Model Classes
@@ -58,8 +65,8 @@ class SnowManModel:
                                g_snowman_height,
                                (g_screen_width / 2 - g_snowman_width / 2),
                                (g_screen_height - g_snowman_height),
-                               0,
-                               3)
+                               g_snowman_vx,
+                               g_snowman_lives)
         self.score = 0
         self.snowman.printAll()
 
@@ -83,7 +90,6 @@ class SnowManModel:
         babsoner.is_visible = 1
 
     def getScore(self, num_rmvd_babsoners):
-        self.score = num_rmvd_babsoners
         return self.score
 
     def update(self):
@@ -145,10 +151,10 @@ class SnowManView:
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
 
-        # Display lives and score
-        score = self.model.getScore(g_num_rmvd_babsoners)
+        # Display current information: lives, level and score
         font = pygame.font.Font(None, 36)
-        text = font.render("Lives: %d / Score: %d" % (model.snowman.lives, score), 1, (10, 10, 10))
+        text = font.render("Lives: %d / Level: %d / Score: %d" % (model.snowman.lives, g_level, self.model.score), \
+                           1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = g_screen_width / 2
         screen.blit(text, textpos)
@@ -166,11 +172,40 @@ class SnowManView:
                     print "x: %d / y: %d", (babsoner.x, babsoner.y)
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
-                #pygame.display.flip()  # commented to remove blinking
-
-
+<<<<<<< HEAD
         pygame.display.flip()
 
+class SnowManPreview:
+    """ Pre-game sequence """
+    def __init__(self, model, screen):
+        self.model = model
+        self.screen = screen
+
+    def draw(self):
+        # Filling Background Color
+        self.screen.fill(pygame.Color(211, 242, 241))
+        
+        # Display title
+        font = pygame.font.Font(None, 40)
+        title = font.render("Mission: Defend the Olin Snowman", 1, (10, 10, 10))
+        textpos = title.get_rect()
+        textpos.centerx = g_screen_width/2
+        textpos.centery = g_screen_height/3
+        screen.blit(title, textpos)
+        
+        # Display subtitle
+        font = pygame.font.Font(None, 20)
+        subtitle = font.render("Instructions: Use your mouse to dodge the babson beavers. Keep the Olin Snowman Alive", 1, (10, 10, 10))
+        subtextpos = subtitle.get_rect()
+        subtextpos.centerx = g_screen_width/2
+        subtextpos.centery = g_screen_height/2
+        screen.blit(subtitle, subtextpos)
+        
+        #update
+=======
+                #pygame.display.flip()  # commented to remove blinking
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
+        pygame.display.flip()
 ############################################################################
 # Controller Classes
 ############################################################################
@@ -197,6 +232,7 @@ class SnowManBabsonerController:
                 babsoner.is_visible = False
                 global g_num_rmvd_babsoners
                 g_num_rmvd_babsoners += 1
+                self.model.score += g_level
 
     def create(self):
         """ """
@@ -244,26 +280,61 @@ if __name__ == "__main__":
     # MVC objects
     model = SnowManModel()
     view = SnowManView(model, screen)
+    preview = SnowManPreview(model, screen)
     controller_mouse = SnowManMouseController(model)
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
 
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
-    pygame.time.set_timer(USEREVENT + 2, 1000)
+    pygame.time.set_timer(USEREVENT + 2, 800)
+    pygame.time.set_timer(USEREVENT + 3, 10000)    # every 10 seconds
 
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
 
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+<<<<<<< HEAD
+                   
+    # Running loop
+    if time >5:
+        running = True
+        play_music(-1,0.0)
+        while running:
+            global g_time
+            for event in pygame.event.get():
+                
+                if event.type == QUIT:
+                    running = False
+                    
+                if event.type == USEREVENT + 2:
+                    global g_time
+                    g_time+= 1
+                    print g_time
+                    
+                if event.type == MOUSEMOTION and g_time>=5:
+                    controller_mouse.handleMouseEvent(event)
+                    
+                if event.type == USEREVENT + 1 and g_time>=5:
+                    controller_babsoner.update()
+                    controller_collision.check()
     
+                if event.type == USEREVENT + 2 and g_time>=5:
+                    controller_babsoner.create()
+            if g_time< 5:
+                preview.draw()
+            if g_time>=5:
+                view.draw()
+            time.sleep(.001)
+=======
+
     #load video
     movie = pygame.movie.Movie('real_wreckingball.mpg')
-    
+
     #skip movie to 'I came in like a wrecking ball' part - starting from about 42sec
     movie.skip(41.5)
-    
+
     # Running loop
     running = True
     play_music(-1,0.0)
@@ -282,6 +353,11 @@ if __name__ == "__main__":
             if event.type == USEREVENT + 2:
                 controller_babsoner.create()
 
+            if event.type == USEREVENT + 3:
+                g_babsoner_vy += 2
+                g_level += 1
+                print "Speed UP!"
+
         view.draw()
         time.sleep(.001)
         if model.snowman.lives == 0:
@@ -293,4 +369,5 @@ if __name__ == "__main__":
             movie.set_display(movie_screen)
             pygame.display.update()
             movie.play()
+>>>>>>> e64bb69bbd7d788eaf087f27330abe21dc316b45
     pygame.quit()
