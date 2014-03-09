@@ -33,9 +33,10 @@ class SnowManModel:
 
 class SnowMan:
     """Encodes state of snowman"""
-    def __init__(self):
+    def __init__(self, width, height, x, y, vx, lives):
+        #inputs:
+        self.width = width
         self.height = height
-        self.width = width 
         self.x = x
         self.y = y
         self.vx = vx #velocity in x direction
@@ -43,9 +44,9 @@ class SnowMan:
 
 class Babsoner:
     """Encodes state of babsoner"""
-    def __init__(self):
-        self.height = height
+    def __init__(self, width, height, x, y, color, vy, is_visible):
         self.width = width
+        self.height = height
         self.x = x
         self.y = y
         self.color = color
@@ -53,13 +54,33 @@ class Babsoner:
         self.is_visible = is_visible
 
 class SnowManView:
-    """ """
-    def __init__(self):
-        pass
-
+    """ A view of brick breaker rendered in a Pygame window """
+    def __init__(self, model,screen):
+        self.model = model
+        self.screen = screen
+        
     def draw(self):
-        pass
-
+        #Filling Background Color
+        self.screen.fill(pygame.Color(211,242,241))
+        #Displaying Babsoners
+        for babsoner in self.model.babsoners:
+            if babsoner.is_visible == 0:
+                image = pygame.image.load("babsoner.png")
+                pygame.transform.scale(image, (babsoner.width,babsoner.height)) #scales image to height and width
+                image.rect = self.image.get_rect() #gets x and y coordinates of image
+                image.rect.x = image.x #moves image to x and y location input:
+                image.rect.y = image.y
+                screen.blit(image, imagerect)
+                pygame.display.flip()
+        #Displaying Snowman
+        snowman_image = pygame.image.load("snowman.png")
+        pygame.transform.scale(image, (self.snowman.width,self.snowman.height)) #scales image to height and width
+        snowman_image.rect = self.snowman_image.get_rect() #gets x and y coordinates of image
+        snowman_image.rect.x = image.x #moves image to x and y location input:
+        snowman_image.rect.y = image.y
+        screen.blit(snowman_image, snowman_imagerect)
+        pygame.display.flip()
+        
 class SnowManMouseController:
     """ """
     def __init__(self):
