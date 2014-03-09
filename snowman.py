@@ -43,6 +43,7 @@ g_babsoner_height = 50
 g_babsoner_vy = 10
 
 g_max_babsoner = 10
+g_num_rmvd_babsoners = 0
 
 ############################################################################
 # Model Classes
@@ -82,7 +83,8 @@ class SnowManModel:
         babsoner.is_visible = 1
 
     def getScore(self, num_rmvd_babsoners, ellapsed_time):
-        self.score += num_rmvd_babsoners + ellapsed_time
+        self.score = num_rmvd_babsoners
+        return self.score
 
     def update(self):
         self.snowman.update()
@@ -142,6 +144,17 @@ class SnowManView:
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
+        
+        # Display score
+        score = self.model.getScore(g_num_rmvd_babsoners, USEREVENT + 2)
+        font = pygame.font.Font(None, 36)
+        text = font.render("Score: " + str(score), 1, (10, 10, 10))
+        textpos = text.get_rect()
+        textpos.centerx = g_screen_width/2
+        screen.blit(text, textpos)
+        
+        # Displaying Snowman
+        screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
 
         # Displaying Babsoners
         for babsoner in self.model.babsoners:
@@ -155,8 +168,7 @@ class SnowManView:
                     sys.exit(1)
                 #pygame.display.flip()  # commented to remove blinking
 
-        # Displaying Snowman
-        screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
+
         pygame.display.flip()
 
 ############################################################################
@@ -181,8 +193,10 @@ class SnowManBabsonerController:
         """ """
         for babsoner in self.model.babsoners:
             babsoner.y += babsoner.vy
-            if babsoner.y > g_screen_height:
+            if babsoner.y > g_screen_height and babsoner.is_visible == True:
                 babsoner.is_visible = False
+                global g_num_rmvd_babsoners
+                g_num_rmvd_babsoners += 1
 
     def create(self):
         """ """
@@ -194,7 +208,17 @@ class SnowManCollisionController:
         self.model = model
 
     def check(self):
-        pass
+        """ Check collision between snowman and babsoner """
+        # Rect(left, top, width, height) -> Rect
+        # Rect((left, top), (width, height)) -> Rect
+        rect_snowman = pygame.Rect(model.snowman.x, model.snowman.y, model.snowman.width, model.snowman.height)
+        for babsoner in self.model.babsoners:
+            if babsoner.is_visible == True:
+                rect = pygame.Rect(babsoner.x, babsoner.y, babsoner.width, babsoner.height)
+                if rect.colliderect(rect_snowman):
+                    model.snowman.lives -= 1
+                    babsoner.is_visible = False
+                    print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
 ############################################################################
 # Add Music
@@ -205,7 +229,7 @@ def play_music(loop,start):
 
 def stop_music():
     pygame.mixer.music.stop()
-    
+
 ############################################################################
 # Main
 ############################################################################
@@ -227,10 +251,10 @@ if __name__ == "__main__":
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 1000)
-    
+
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
-    
+
     #set music volume
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
     
@@ -261,6 +285,9 @@ if __name__ == "__main__":
 
         view.draw()
         time.sleep(.001)
+        if model.snowman.lives == 0:
+            running = False
+            # Add code for video here!
 
     pygame.quit()
 
