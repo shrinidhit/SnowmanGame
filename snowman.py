@@ -43,6 +43,7 @@ g_babsoner_height = 50
 g_babsoner_vy = 10
 
 g_max_babsoner = 10
+g_num_rmvd_babsoners = 0
 
 ############################################################################
 # Model Classes
@@ -82,7 +83,8 @@ class SnowManModel:
         babsoner.is_visible = 1
 
     def getScore(self, num_rmvd_babsoners, ellapsed_time):
-        self.score += num_rmvd_babsoners + ellapsed_time
+        self.score = num_rmvd_babsoners
+        return self.score
 
     def update(self):
         self.snowman.update()
@@ -142,6 +144,17 @@ class SnowManView:
     def draw(self):
         # Filling Background Color
         self.screen.fill(pygame.Color(211, 242, 241))
+        
+        # Display score
+        score = self.model.getScore(g_num_rmvd_babsoners, USEREVENT + 2)
+        font = pygame.font.Font(None, 36)
+        text = font.render("Score: " + str(score), 1, (10, 10, 10))
+        textpos = text.get_rect()
+        textpos.centerx = g_screen_width/2
+        screen.blit(text, textpos)
+        
+        # Displaying Snowman
+        screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
 
         # Displaying Babsoners
         for babsoner in self.model.babsoners:
@@ -155,8 +168,7 @@ class SnowManView:
                     sys.exit(1)
                 #pygame.display.flip()  # commented to remove blinking
 
-        # Displaying Snowman
-        screen.blit(self.model.snowman.image, (model.snowman.x, model.snowman.y))
+
         pygame.display.flip()
 
 ############################################################################
@@ -181,8 +193,10 @@ class SnowManBabsonerController:
         """ """
         for babsoner in self.model.babsoners:
             babsoner.y += babsoner.vy
-            if babsoner.y > g_screen_height:
+            if babsoner.y > g_screen_height and babsoner.is_visible == True:
                 babsoner.is_visible = False
+                global g_num_rmvd_babsoners
+                g_num_rmvd_babsoners += 1
 
     def create(self):
         """ """
