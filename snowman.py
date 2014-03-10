@@ -35,23 +35,33 @@ import sys, traceback
 g_screen_width = 640
 g_screen_height = 640
 
-g_snowman_width = 60
-g_snowman_height = 120
+g_snowman_width = 50
+g_snowman_height = 100
 g_snowman_vx = 0
-g_snowman_lives = 5
+g_snowman_lives = 6
 
-g_babsoner_width = 70
-g_babsoner_height = 50
-g_babsoner_vy = 10
+g_babsoner_width = 60
+g_babsoner_height = 45
+g_babsoner_vy = 5
 
-g_babsoner_vy_increase = 2
-g_babsoner_vy_max = 20
+g_babsoner_vy_increase = 0.8
+g_babsoner_vy_max = 17
+g_babsoner_vy_pink_factor = 1.3
 g_babsoner_magnify_max = 150    # percentile
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
 g_time = 0
 g_level = 1
+
+g_max_level = 20
+# create is invoked every 50ms so if 10, 10*50ms = 500ms
+g_create_checker_list = [
+    15, 14, 13, 12, 11, 10,  9,  8,  7,  7,
+     6,  6,  5,  5,  4,  4,  3,  3,  2,  2,
+     1
+]
+g_create_checker_list_max = max(g_create_checker_list)
 
 ############################################################################
 # Model Classes
@@ -118,7 +128,7 @@ class SnowManModel:
                                        height,
                                        random.randint(min_x, max_x),
                                        0,
-                                       int(g_babsoner_vy * 1.5),
+                                       int(g_babsoner_vy * g_babsoner_vy_pink_factor),
                                        True)
                     else:
                         babsoner.reset(width,
@@ -222,7 +232,7 @@ class SnowManView:
                     sys.exit(1)
         pygame.display.flip()
 
-    def score_Chart(self):
+    def drawScore(self):
         # Filling Background Color
         size = (g_screen_width, g_screen_height)
         screen = pygame.display.set_mode(size)
@@ -240,6 +250,7 @@ class SnowManView:
         pygame.display.flip()
 
     def playMovie(self):
+        """ """
         FPS = 60
         clock = pygame.time.Clock()
         movie = pygame.movie.Movie('wreck_edit_use.mpg')
@@ -257,14 +268,23 @@ class SnowManView:
                 if event.type == pygame.QUIT:
                     movie.stop()
                     playing = False
-            print 'current:' + str(movie.get_time())
-            print 'total:' + str(movie.get_length())
+            #print 'current:' + str(movie.get_time())
+            #print 'total:' + str(movie.get_length())
             if movie.get_time() >= movie.get_length() - 42:
                 movie.stop()
                 playing = False
             screen.blit(movie_screen,(0,0))
             pygame.display.update()
             clock.tick(FPS)
+
+    def showScore(self):
+        """ """
+        chart_showing = True
+        while chart_showing:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    chart_showing = False
+            view.drawScore()
 
 class SnowManPreview:
     """ Pre-game sequence """
@@ -280,8 +300,8 @@ class SnowManPreview:
         font = pygame.font.Font(None, 40)
         title = font.render("Mission: Defend the Olin Snowman", 1, (10, 10, 10))
         textpos = title.get_rect()
-        textpos.centerx = g_screen_width/2
-        textpos.centery = g_screen_height/3
+        textpos.centerx = g_screen_width / 2
+        textpos.centery = g_screen_height / 3
         screen.blit(title, textpos)
 
         # Display subtitle
@@ -306,6 +326,7 @@ class SnowManMouseController:
     def handleMouseEvent(self, event):
         if event.type == MOUSEMOTION:
             self.model.snowman.x = event.pos[0] - (self.model.snowman.width / 2.0)
+            self.model.snowman.y = event.pos[1] - (self.model.snowman.height / 2.0)
 
 class SnowManBabsonerController:
     """ """
@@ -396,9 +417,10 @@ if __name__ == "__main__":
         preview.draw()
 
     # Create timer event for user events
-    pygame.time.set_timer(USEREVENT + 1, 50)
-    pygame.time.set_timer(USEREVENT + 2, 800)
+    pygame.time.set_timer(USEREVENT + 1, 40)
+    pygame.time.set_timer(USEREVENT + 2, 50)
     pygame.time.set_timer(USEREVENT + 3, 7000)    # every 8 seconds
+    create_checker = 1
 
     # Running loop
     running = True
@@ -415,12 +437,18 @@ if __name__ == "__main__":
                 controller_collision.check()
 
             if event.type == USEREVENT + 2:
-                controller_babsoner.create()
+                if create_checker % g_create_checker_list[g_level] == 0:
+                    controller_babsoner.create()
+                create_checker += 1
+                if create_checker > g_create_checker_list_max:
+                    create_checker = 1
+                print create_checker
 
             if event.type == USEREVENT + 3:
                 if g_babsoner_vy < g_babsoner_vy_max:
                     g_babsoner_vy += g_babsoner_vy_increase
-                g_level += 1
+                if g_level < g_max_level:
+                    g_level += 1
                 print "Level UP!"
         view.draw()
         time.sleep(.001)
@@ -429,15 +457,9 @@ if __name__ == "__main__":
             running = False
             pygame.mixer.quit()
 
-    # Playi wrecking ball movie
+    # Play wrecking ball movie
     view.playMovie()
 
-    # Printing score
-    chart_showing = True
-    while chart_showing:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                chart_showing = False
-        view.score_Chart()
+    view.showScore()
 
     pygame.quit()
