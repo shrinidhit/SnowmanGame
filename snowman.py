@@ -51,6 +51,7 @@ g_screen_height = 640
 # Snowman
 g_snowman_width = 50
 g_snowman_height = 100
+g_snowman_half_height = 70
 g_snowman_vx = 0
 g_snowman_lives = 6
 
@@ -174,11 +175,17 @@ class SnowMan:
 
         self.is_half = False
 
-    def transfromToHalf(self):
+    def transformToHalf(self):
         if self.is_half == False:
-            self.height = int(self.height * 0.7)
+            self.height = g_snowman_half_height
             self.image = pygame.transform.scale(pygame.image.load(g_snowman_half_path), (self.width, self.height))
             self.is_half = True
+
+    def transfromToOriginal(self):
+        if self.is_half == True:
+            self.height = g_snowman_height
+            self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
+            self.is_half = False
 
 class Babsoner:
     """ Encodes state of babsoner """
@@ -381,7 +388,7 @@ class SnowManCollisionController:
                     else:
                         model.snowman.lives -= 1
                     if model.snowman.lives <= g_snowman_lives / 2:
-                        model.snowman.transfromToHalf()
+                        model.snowman.transformToHalf()
                     babsoner.is_visible = False
 
 class SnowManMusicController:
