@@ -33,7 +33,7 @@ import sys, traceback
 ############################################################################
 
 # File paths
-g_snowman_path = "./image/snowman_half.png"
+g_snowman_path = "./image/snowman.png"
 g_babsoner_path = "./image/babsoner.png"
 g_babsoner_flip_path = "./image/babsoner_flip.png"
 g_babsoner_pink_path = "./image/babsoner_pink.png"
@@ -384,42 +384,45 @@ class SnowManCollisionController:
                     babsoner.is_visible = False
                     print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
-############################################################################
-# Music functions
-############################################################################
-
-def playMusic(loop,start):
-    pygame.mixer.music.play(loop,start)
-
-def stopMusic():
-    pygame.mixer.music.stop()
-
-def pauseMusic():
-    pygame.mixer.music.pause()
-
-def musicChanger():
-    if g_level % 10 == 1:
-        stopMusic()
+class SnowManMusicController:
+    def __init__(self):
+        self.jamesbond = None
+        self.pinkpanther = None
         pygame.mixer.music.load(g_music_jamesbond_path)
-        playMusic(-1,0.0)
-        jamestime = pygame.mixer.music.get_pos()
-    if g_level % 10 == 6:
-        stopMusic()
-        pygame.mixer.music.load(g_music_pinkpanther_path)
-        playMusic(-1,0.0)
-        panthertime = pygame.mixer.music.get_pos()
-    if g_level % 10 == range(2,6):
-        pygame.mixer.music.load(g_music_jamesbond_path)
-        pygame.mixer.music.set_pos(jamestime)
-        playMusic(-1,jamestime)
-        newtime = pygame.mixer.music.get_pos()
-        jamestime += newtime
-    if g_level % 10 == range(6,11):
-        pygame.mixer.music.load(g_music_pinkpanther_path)
-        pygame.mixer.music.set_pos(panthertime)
-        playMusic(-1,panthertime)
-        newwtime = pygame.mixer.music.get_pos()
-        panthertime += newwtime
+        pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+
+    def playMusic(self, loop,start):
+        pygame.mixer.music.play(loop, start)
+
+    def stopMusic(self):
+        pygame.mixer.music.stop()
+
+    def pauseMusic(self):
+        pygame.mixer.music.pause()
+
+    def changeMusisc(self):
+        if g_level % 10 == 1:
+            self.stopMusic()
+            pygame.mixer.music.load(g_music_jamesbond_path)
+            self.playMusic(-1, 0.0)
+            self.jamestime = pygame.mixer.music.get_pos()
+        if g_level % 10 == 6:
+            self.stopMusic()
+            pygame.mixer.music.load(g_music_pinkpanther_path)
+            self.playMusic(-1, 0.0)
+            self.panthertime = pygame.mixer.music.get_pos()
+        if g_level % 10 == range(2, 6):
+            pygame.mixer.music.load(g_music_jamesbond_path)
+            pygame.mixer.music.set_pos(self.jamestime)
+            self.playMusic(-1, self.jamestime)
+            newtime = pygame.mixer.music.get_pos()
+            self.jamestime += newtime
+        if g_level % 10 == range(6, 11):
+            pygame.mixer.music.load(g_music_pinkpanther_path)
+            pygame.mixer.music.set_pos(self.panthertime)
+            self.playMusic(-1, self.panthertime)
+            newwtime = pygame.mixer.music.get_pos()
+            self.panthertime += newwtime
 
 ############################################################################
 # Main
@@ -439,11 +442,10 @@ if __name__ == "__main__":
     controller_mouse = SnowManMouseController(model)
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
+    controller_music = SnowManMusicController()
 
     # Play music
-    pygame.mixer.music.load(g_music_jamesbond_path)
-    pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
-    playMusic(-1,0.0)
+    controller_music.playMusic(-1, 0.0)
 
     # Create timer event for preview
     pygame.time.set_timer(USEREVENT + 1, 1000)
@@ -498,7 +500,7 @@ if __name__ == "__main__":
                 if g_level < g_max_level:
                     g_level += 1
                     print "Level UP!"
-                musicChanger()
+                controller_music.changeMusisc()
         view.draw()
         time.sleep(.001)
 
