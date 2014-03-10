@@ -176,14 +176,34 @@ class SnowManView:
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
         pygame.display.flip()
-    
+        
+    def score_Chart(self):
+        # Filling Background Color
+        size = (g_screen_width, g_screen_height)
+        screen = pygame.display.set_mode(size)
+        screen.fill(pygame.Color(211, 242, 241))
+
+        # Display current information: lives, level and score
+        font = pygame.font.Font(None, 40)
+        text = font.render("Level Reached: %d / Your Score: %d" % (g_level, self.model.score), \
+                           1, (10, 10, 10))
+        textpos = text.get_rect()
+        textpos.centerx = g_screen_width / 2
+        textpos.centery = g_screen_height/2
+        screen.blit(text, textpos)
+        #updating
+        pygame.display.flip()
+        
     def play_Movie(self):
         FPS = 60
         clock = pygame.time.Clock()
-        movie = pygame.movie.Movie('real_wreckingball.mpg')
+        movie = pygame.movie.Movie('wreck_edit_use.mpg')
         movie.skip(41.5)
-        screen = pygame.display.set_mode(movie.get_size())
-        movie_screen = pygame.Surface(movie.get_size()).convert()
+        size = (g_screen_width, g_screen_height)
+        screen = pygame.display.set_mode(size)
+        #screen = pygame.display.set_mode(movie.get_size())
+        #movie_screen = pygame.Surface(movie.get_size()).convert()
+        movie_screen = pygame.Surface(size).convert()
         movie.set_display(movie_screen)
         movie.play()
         playing = True
@@ -192,6 +212,11 @@ class SnowManView:
                 if event.type == pygame.QUIT:
                     movie.stop()
                     playing = False
+            print 'current:' + str(movie.get_time())
+            print 'total:' + str(movie.get_length())
+            if movie.get_time() >= movie.get_length() - 42:
+                movie.stop()
+                playing = False
             screen.blit(movie_screen,(0,0))
             pygame.display.update()
             clock.tick(FPS)
@@ -350,7 +375,6 @@ if __name__ == "__main__":
                 g_babsoner_vy += 2
                 g_level += 1
                 print "Speed UP!"
-
         view.draw()
         time.sleep(.001)
 
@@ -358,9 +382,13 @@ if __name__ == "__main__":
             running = False
             # Add code for video here!
             pygame.mixer.quit()
-    #Printing score:
-    
     #Playing wrecking ball movie:
     view.play_Movie()
-    #Ending Game:
+    #printing score:
+    chart_showing = True
+    while chart_showing:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                chart_showing = False
+        view.score_Chart()
     pygame.quit()
