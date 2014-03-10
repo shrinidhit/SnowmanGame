@@ -340,9 +340,14 @@ if __name__ == "__main__":
     controller_mouse = SnowManMouseController(model)
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
-
+    
     # Create timer event for preview
     pygame.time.set_timer(USEREVENT + 1, 1000)
+     #play music
+    pygame.mixer.music.load('jamesbond.mp3')
+    pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+    playMusic(-1,0.0)
+    #Preview:
     while g_time < 5:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -357,18 +362,13 @@ if __name__ == "__main__":
     pygame.time.set_timer(USEREVENT + 2, 800)
     pygame.time.set_timer(USEREVENT + 3, 8000)    # every 8 seconds
 
-    #load music
-    pygame.mixer.music.load('jamesbond.mp3')
-
-    # set music volume
-    pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+   
 
     #load video
     #movie = pygame.movie.Movie('real_wreckingball.mpg')
 
     # Running loop
     running = True
-    playMusic(-1,0.0)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
