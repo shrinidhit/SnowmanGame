@@ -33,7 +33,7 @@ import sys, traceback
 ############################################################################
 
 g_screen_width = 640
-g_screen_height = 480
+g_screen_height = 640
 
 g_snowman_width = 60
 g_snowman_height = 120
@@ -43,6 +43,10 @@ g_snowman_lives = 5
 g_babsoner_width = 70
 g_babsoner_height = 50
 g_babsoner_vy = 10
+
+g_babsoner_vy_increase = 2
+g_babsoner_vy_max = 20
+g_babsoner_magnify_max = 150    # percentile
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
@@ -80,16 +84,30 @@ class SnowManModel:
         else:
             for babsoner in self.babsoners:
                 if babsoner.is_visible == False:
-                    width = g_snowman_width
-                    height = g_snowman_height
+                    # Width and height are generated randomly if level >= 3
+                    width = g_babsoner_width
+                    height = g_babsoner_height
                     if g_level >= 3:
-                        r = random.randint(80, 100 + g_level * 2)
+                        r = random.randint(90, 100 + g_level * 5)
                         if r > 100:
-                            width *= float(r / 100)
-                            height *= float(r / 100)
+                            r = (g_babsoner_magnify_max) if (r > g_babsoner_magnify_max) else (r)
+                            width = int(width * float(r / 100.0))
+                            height = int(height * float(r / 100.0))
+                    print width, height
+                    # X coordinate is generated randomly but centered to current snowman
+                    min_x = model.snowman.x - int(g_screen_width / 3.0)
+                    max_x = model.snowman.x + int(g_screen_width / 3.0)
+                    if min_x < 0:
+                        max_x += -(min_x)
+                        min_x = 0
+                    if max_x > g_screen_width - width:
+                        min_x -= max_x - (g_screen_width - width)
+                        max_x = g_screen_width - width
+                    print max_x - min_x
+                    # Reset babsoner
                     babsoner.reset(width,
                                    height,
-                                   random.randint(0, g_screen_width - g_babsoner_width),
+                                   random.randint(min_x, max_x),
                                    0,
                                    g_babsoner_vy)
                     break
@@ -133,12 +151,7 @@ class Babsoner:
         self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
     def reset(self, width, height, x, y, vy):
-        self.width = width
-        self.height = height
-        self.x = x
-        self.y = y
-        self.vy = vy
-        self.is_visible = True
+        self.__init__(width, height, x, y, vy, True)
 
 ############################################################################
 # View Classes
@@ -193,8 +206,8 @@ class SnowManView:
         screen.blit(text, textpos)
         #updating
         pygame.display.flip()
-        
-    def play_Movie(self):
+
+    def playMovie(self):
         FPS = 60
         clock = pygame.time.Clock()
         movie = pygame.movie.Movie('wreck_edit_use.mpg')
@@ -220,6 +233,7 @@ class SnowManView:
             screen.blit(movie_screen,(0,0))
             pygame.display.update()
             clock.tick(FPS)
+            
 class SnowManPreview:
     """ Pre-game sequence """
     def __init__(self, model, screen):
@@ -302,10 +316,10 @@ class SnowManCollisionController:
 # Add Music
 ############################################################################
 
-def play_music(loop,start):
+def playMusic(loop,start):
     pygame.mixer.music.play(loop,start)
 
-def stop_music():
+def stopMusic():
     pygame.mixer.music.stop()
 
 ############################################################################
@@ -332,7 +346,6 @@ if __name__ == "__main__":
     while g_time < 5:
         for event in pygame.event.get():
             if event.type == QUIT:
-                exitGame()
                 sys.exit(0)
 
             if event.type == USEREVENT + 1:
@@ -352,10 +365,10 @@ if __name__ == "__main__":
 
     #load video
     #movie = pygame.movie.Movie('real_wreckingball.mpg')
-    
+
     # Running loop
     running = True
-    play_music(-1,0.0)
+    playMusic(-1,0.0)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -372,7 +385,8 @@ if __name__ == "__main__":
                 controller_babsoner.create()
 
             if event.type == USEREVENT + 3:
-                g_babsoner_vy += 2
+                if g_babsoner_vy < g_babsoner_vy_max:
+                    g_babsoner_vy += g_babsoner_vy_increase
                 g_level += 1
                 print "Speed UP!"
         view.draw()
@@ -383,7 +397,7 @@ if __name__ == "__main__":
             # Add code for video here!
             pygame.mixer.quit()
     #Playing wrecking ball movie:
-    view.play_Movie()
+    view.playMovie()
     #printing score:
     chart_showing = True
     while chart_showing:
@@ -391,4 +405,5 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 chart_showing = False
         view.score_Chart()
+    #Ending Game:
     pygame.quit()
