@@ -51,9 +51,18 @@ g_screen_height = 640
 # Snowman
 g_snowman_width = 50
 g_snowman_height = 100
+
 g_snowman_half_height = 70
+
+g_snowman_big_width = 150
+g_snowman_big_height = 300
+
 g_snowman_vx = 0
 g_snowman_lives = 6
+
+g_snowman_state_normal = 0
+g_snowman_state_half = 1
+g_snowman_state_big = 3
 
 # Bansoner
 g_babsoner_width = 60
@@ -173,19 +182,19 @@ class SnowMan:
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
 
-        self.is_half = False
+        self.state = g_snowman_state_normal
 
-    def transformToHalf(self):
-        if self.is_half == False:
-            self.height = g_snowman_half_height
-            self.image = pygame.transform.scale(pygame.image.load(g_snowman_half_path), (self.width, self.height))
-            self.is_half = True
-
-    def transfromToOriginal(self):
-        if self.is_half == True:
+    def transform(self, state):
+        if state == g_snowman_state_normal:
             self.height = g_snowman_height
             self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
-            self.is_half = False
+        elif state == g_snowman_state_half:
+            self.height = g_snowman_half_height
+            self.image = pygame.transform.scale(pygame.image.load(g_snowman_half_path), (self.width, self.height))
+        elif state == g_snowman_state_big:
+            self.width = g_snowman_big_width
+            self.height = g_snowman_big_height
+            self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
 
 class Babsoner:
     """ Encodes state of babsoner """
@@ -383,12 +392,20 @@ class SnowManCollisionController:
             if babsoner.is_visible == True:
                 rect = pygame.Rect(babsoner.x, babsoner.y, babsoner.width, babsoner.height)
                 if rect.colliderect(rect_snowman):
-                    if babsoner.is_pink:
-                        model.snowman.lives -= 2
+                    if model.snowman.state == g_snowman_state_big:
+                        pass
                     else:
-                        model.snowman.lives -= 1
-                    if model.snowman.lives <= g_snowman_lives / 2:
-                        model.snowman.transformToHalf()
+                        if babsoner.is_pink:
+                            model.snowman.lives -= 2
+                        else:
+                            model.snowman.lives -= 1
+                    # Transfrom snowman
+                    if model.snowman.lives > g_snowman_lives / 2:
+                        if model.snowman.state != g_snowman_state_normal:
+                            model.snowman.transform(g_snowman_state_normal)
+                    elif model.snowman.lives <= g_snowman_lives / 2:
+                        if model.snowman.state != g_snowman_state_half:
+                            model.snowman.transform(g_snowman_state_half)
                     babsoner.is_visible = False
 
 class SnowManMusicController:
