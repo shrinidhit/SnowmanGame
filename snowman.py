@@ -283,6 +283,9 @@ def playMusic(loop,start):
 
 def stopMusic():
     pygame.mixer.music.stop()
+    
+def pauseMusic():
+    pygame.mixer.music.pause()
 
 ############################################################################
 # Main
@@ -351,6 +354,31 @@ if __name__ == "__main__":
                 g_babsoner_vy += 2
                 g_level += 1
                 print "Speed UP!"
+                if g_level % 10 == 1:
+                    stopMusic()
+                    pygame.mixer.music.load('jamesbond.mp3')
+                    playMusic(-1,0.0)
+                    jamestime = pygame.mixer.music.get_pos()
+                if g_level % 10 == 6:
+                    stopMusic()
+                    pygame.mixer.music.load('pinkpanther.mp3')
+                    playMusic(-1,0.0)
+                    panthertime = pygame.mixer.music.get_pos()
+                if g_level % 10 == range(2,6):
+                    pygame.mixer.music.load('jamesbond.mp3')
+                    pygame.mixer.music.set_pos(jamestime)
+                    playMusic(-1,jamestime)
+                    newtime = pygame.mixer.music.get_pos()
+                    jamestime += newtime
+                if g_level % 10 == range(6,11):
+                    pygame.mixer.music.load('pinkpanther.mp3')
+                    pygame.mixer.music.set_pos(panthertime)
+                    playMusic(-1,panthertime)
+                    newwtime = pygame.mixer.music.get_pos()
+                    panthertime += newwtime
+                    
+                    
+                    
 
         view.draw()
         time.sleep(.001)
