@@ -176,7 +176,25 @@ class SnowManView:
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
         pygame.display.flip()
-
+    
+    def play_Movie(self):
+        FPS = 60
+        clock = pygame.time.Clock()
+        movie = pygame.movie.Movie('real_wreckingball.mpg')
+        movie.skip(41.5)
+        screen = pygame.display.set_mode(movie.get_size())
+        movie_screen = pygame.Surface(movie.get_size()).convert()
+        movie.set_display(movie_screen)
+        movie.play()
+        playing = True
+        while playing:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    movie.stop()
+                    playing = False
+            screen.blit(movie_screen,(0,0))
+            pygame.display.update()
+            clock.tick(FPS)
 class SnowManPreview:
     """ Pre-game sequence """
     def __init__(self, model, screen):
@@ -269,9 +287,6 @@ def stop_music():
 # Main
 ############################################################################
 
-def exitGame():
-    pass
-
 if __name__ == "__main__":
     pygame.init()
 
@@ -343,22 +358,9 @@ if __name__ == "__main__":
             running = False
             # Add code for video here!
             pygame.mixer.quit()
-    #playing wrecking ball movie:
-    FPS = 60
-    clock = pygame.time.Clock()
-    movie = pygame.movie.Movie('real_wreckingball.mpg')
-    movie.skip(41.5)
-    screen = pygame.display.set_mode(movie.get_size())
-    movie_screen = pygame.Surface(movie.get_size()).convert()
-    movie.set_display(movie_screen)
-    movie.play()
-    playing = True
-    while playing:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                movie.stop()
-                playing = False
-        screen.blit(movie_screen,(0,0))
-        pygame.display.update()
-        clock.tick(FPS)
+    #Printing score:
+    
+    #Playing wrecking ball movie:
+    view.play_Movie()
+    #Ending Game:
     pygame.quit()
