@@ -311,11 +311,8 @@ if __name__ == "__main__":
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
 
     #load video
-    movie = pygame.movie.Movie('real_wreckingball.mpg')
-
-    #skip movie to 'I came in like a wrecking ball' part - starting from about 42sec
-    movie.skip(41.5)
-
+    #movie = pygame.movie.Movie('real_wreckingball.mpg')
+    
     # Running loop
     running = True
     play_music(-1,0.0)
@@ -346,9 +343,22 @@ if __name__ == "__main__":
             running = False
             # Add code for video here!
             pygame.mixer.quit()
-            screen = pygame.display.set_mode(movie.get_size())
-            movie_screen = pygame.Surface(movie.get_size()).convert()
-            movie.set_display(movie_screen)
-            pygame.display.update()
-            movie.play()
+    #playing wrecking ball movie:
+    FPS = 60
+    clock = pygame.time.Clock()
+    movie = pygame.movie.Movie('real_wreckingball.mpg')
+    movie.skip(41.5)
+    screen = pygame.display.set_mode(movie.get_size())
+    movie_screen = pygame.Surface(movie.get_size()).convert()
+    movie.set_display(movie_screen)
+    movie.play()
+    playing = True
+    while playing:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                movie.stop()
+                playing = False
+        screen.blit(movie_screen,(0,0))
+        pygame.display.update()
+        clock.tick(FPS)
     pygame.quit()
