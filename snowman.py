@@ -34,6 +34,7 @@ import sys, traceback
 
 # File paths
 g_snowman_path = "./image/snowman.png"
+g_snowman_half_path = "./image/snowman_half.png"
 g_babsoner_path = "./image/babsoner.png"
 g_babsoner_flip_path = "./image/babsoner_flip.png"
 g_babsoner_pink_path = "./image/babsoner_pink.png"
@@ -51,7 +52,7 @@ g_screen_height = 640
 g_snowman_width = 50
 g_snowman_height = 100
 g_snowman_vx = 0
-g_snowman_lives = 5
+g_snowman_lives = 6
 
 # Bansoner
 g_babsoner_width = 60
@@ -72,7 +73,7 @@ g_level = 1
 g_max_level = 20
 # create is invoked every 50ms so if 10, 10*50ms = 500ms
 g_create_checker_list = [
-    15, 14, 13, 12, 11, 11, 10, 10,  9,  8,
+    15, 15, 14, 13, 12, 11, 10,  9,  8,  7,
      7,  6,  5,  5,  4,  4,  3,  3,  2,  2,
      1
 ]
@@ -170,6 +171,14 @@ class SnowMan:
         self.vx = vx
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
+
+        self.is_half = False
+
+    def transfromToHalf(self):
+        if self.is_half == False:
+            self.height = int(self.height * 0.7)
+            self.image = pygame.transform.scale(pygame.image.load(g_snowman_half_path), (self.width, self.height))
+            self.is_half = True
 
 class Babsoner:
     """ Encodes state of babsoner """
@@ -371,7 +380,8 @@ class SnowManCollisionController:
                         model.snowman.lives -= 2
                     else:
                         model.snowman.lives -= 1
-
+                    if model.snowman.lives <= g_snowman_lives / 2:
+                        model.snowman.transfromToHalf()
                     babsoner.is_visible = False
 
 class SnowManMusicController:
