@@ -78,7 +78,8 @@ class SnowManModel:
                               random.randint(0, g_screen_width - g_babsoner_width),
                               0,
                               g_babsoner_vy,
-                              True)
+                              True,
+                              False)
             self.babsoners.append(babson)
             print "Babsoner Created! - %d" % (len(self.babsoners))
         else:
@@ -93,8 +94,8 @@ class SnowManModel:
                             r = (g_babsoner_magnify_max) if (r > g_babsoner_magnify_max) else (r)
                             width = int(width * float(r / 100.0))
                             height = int(height * float(r / 100.0))
-                    print width, height
-                    # X coordinate is generated randomly but centered to current snowman
+                    #print width, height
+                    # X coordinate is generated randomly but centered to current location of snowman
                     min_x = model.snowman.x - int(g_screen_width / 3.0)
                     max_x = model.snowman.x + int(g_screen_width / 3.0)
                     if min_x < 0:
@@ -103,13 +104,23 @@ class SnowManModel:
                     if max_x > g_screen_width - width:
                         min_x -= max_x - (g_screen_width - width)
                         max_x = g_screen_width - width
-                    print max_x - min_x
+                    #print max_x - min_x
                     # Reset babsoner
-                    babsoner.reset(width,
-                                   height,
-                                   random.randint(min_x, max_x),
-                                   0,
-                                   g_babsoner_vy)
+                    r = random.randint(0, 7)
+                    if r == 0:  # Pink!
+                        babsoner.reset(width,
+                                       height,
+                                       random.randint(min_x, max_x),
+                                       0,
+                                       int(g_babsoner_vy * 1.5),
+                                       True)
+                    else:
+                        babsoner.reset(width,
+                                       height,
+                                       random.randint(min_x, max_x),
+                                       0,
+                                       g_babsoner_vy,
+                                       False)
                     break
 
     def getScore(self, num_rmvd_babsoners):
@@ -138,20 +149,35 @@ class SnowMan:
 
 class Babsoner:
     """ Encodes state of babsoner """
-    def __init__(self, width, height, x, y, vy, is_visible):
+    def __init__(self, width, height, x, y, vy, is_visible, is_pink):
         self.width = width
         self.height = height
         self.x = x
         self.y = y
         self.vy = vy
         self.is_visible = is_visible
-        self.image = pygame.transform.scale(pygame.image.load("./babsoner.png"), (self.width, self.height))
+        self.is_pink = is_pink
+
+        r = random.randint(0, 2)
+        image = None
+        if is_pink:
+            if r == 0:
+                image = pygame.image.load("./babsoner_pink_flip.png")
+            else:
+                image = pygame.image.load("./babsoner_pink.png")
+        else:
+            if r == 0:
+                image = pygame.image.load("./babsoner_flip.png")
+            else:
+                image = pygame.image.load("./babsoner.png")
+
+        self.image = pygame.transform.scale(image, (self.width, self.height))
         # Make image transparent
         alpha = 255
         self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
-    def reset(self, width, height, x, y, vy):
-        self.__init__(width, height, x, y, vy, True)
+    def reset(self, width, height, x, y, vy, is_pink):
+        self.__init__(width, height, x, y, vy, True, is_pink)
 
 ############################################################################
 # View Classes
@@ -208,7 +234,7 @@ class SnowManView:
             screen.blit(movie_screen,(0,0))
             pygame.display.update()
             clock.tick(FPS)
-            
+
 class SnowManPreview:
     """ Pre-game sequence """
     def __init__(self, model, screen):
@@ -283,7 +309,11 @@ class SnowManCollisionController:
             if babsoner.is_visible == True:
                 rect = pygame.Rect(babsoner.x, babsoner.y, babsoner.width, babsoner.height)
                 if rect.colliderect(rect_snowman):
-                    model.snowman.lives -= 1
+                    if babsoner.is_pink:
+                        model.snowman.lives -= 2
+                    else:
+                        model.snowman.lives -= 1
+
                     babsoner.is_visible = False
                     print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
