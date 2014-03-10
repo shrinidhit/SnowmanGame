@@ -33,7 +33,7 @@ import sys, traceback
 ############################################################################
 
 # File paths
-g_snowman_path = "./image/snowman.png"
+g_snowman_path = "./image/snowman_half.png"
 g_babsoner_path = "./image/babsoner.png"
 g_babsoner_flip_path = "./image/babsoner_flip.png"
 g_babsoner_pink_path = "./image/babsoner_pink.png"
@@ -385,7 +385,7 @@ class SnowManCollisionController:
                     print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
 ############################################################################
-# Add Music
+# Music functions
 ############################################################################
 
 def playMusic(loop,start):
@@ -452,6 +452,7 @@ if __name__ == "__main__":
     while g_time < 5:
         for event in pygame.event.get():
             if event.type == QUIT:
+                pygame.quit()
                 sys.exit(0)
 
             if event.type == USEREVENT + 1:
@@ -466,10 +467,13 @@ if __name__ == "__main__":
 
     # Running loop
     running = True
+    quit_from_game = True
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
+                quit_from_game = False
                 running = False
+                break
 
             if event.type == MOUSEMOTION:
                 controller_mouse.handleMouseEvent(event)
@@ -486,7 +490,7 @@ if __name__ == "__main__":
                     create_checker += 1
                     if create_checker > g_create_checker_list_max:
                         create_checker = 1
-                print create_checker
+                #print create_checker
 
             if event.type == USEREVENT + 3:
                 if g_babsoner_vy < g_babsoner_vy_max:
@@ -500,10 +504,12 @@ if __name__ == "__main__":
 
         if model.snowman.lives <= 0:
             running = False
-            pygame.mixer.quit()
 
-    # Play wrecking ball movie
-    view.playMovie()
+    pygame.mixer.quit()
+
+    if quit_from_game:
+        # Play wrecking ball movie
+        view.playMovie()
 
     view.showScore()
 
