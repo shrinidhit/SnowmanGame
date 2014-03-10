@@ -72,9 +72,9 @@ g_level = 1
 g_max_level = 20
 # create is invoked every 50ms so if 10, 10*50ms = 500ms
 g_create_checker_list = [
-    20, 20, 19, 18, 17, 16, 15, 14, 13, 12,
-    11, 10,  9,  8,  7,  7,  6,  6,  6,  5,
-     4
+    15, 14, 13, 12, 11, 11, 10, 10,  9,  8,
+     7,  6,  5,  5,  4,  4,  3,  3,  2,  2,
+     1
 ]
 g_create_checker_list_max = max(g_create_checker_list)
 
@@ -102,6 +102,7 @@ class SnowManModel:
                               g_babsoner_height,
                               random.randint(0, g_screen_width - g_babsoner_width),
                               0,
+                              0,
                               g_babsoner_vy,
                               True,
                               False)
@@ -125,11 +126,11 @@ class SnowManModel:
                     # X coordinate is generated randomly but centered to current location of snowman
                     if r_pink == 0:
                         # Pink one is coming much closer!
-                        min_x = model.snowman.x - int(g_screen_width / 6.0)
-                        max_x = model.snowman.x + int(g_screen_width / 6.0)
+                        min_x = model.snowman.x - int(g_screen_width / 8.0)
+                        max_x = model.snowman.x + int(g_screen_width / 8.0)
                     else:
-                        min_x = model.snowman.x - int(g_screen_width / 3.0)
-                        max_x = model.snowman.x + int(g_screen_width / 3.0)
+                        min_x = model.snowman.x - int(g_screen_width / 4.0)
+                        max_x = model.snowman.x + int(g_screen_width / 4.0)
                     if min_x < 0:
                         max_x += -(min_x)
                         min_x = 0
@@ -137,12 +138,15 @@ class SnowManModel:
                         min_x -= max_x - (g_screen_width - width)
                         max_x = g_screen_width - width
 
+                    vx = random.randint(-(g_level / 2), g_level / 2)
+
                     # Reset babsoner
                     if r_pink == 0:  # Pink!
                         babsoner.reset(width,
                                        height,
                                        random.randint(min_x, max_x),
                                        0,
+                                       vx,
                                        int(g_babsoner_vy * g_babsoner_vy_pink_factor),
                                        True)
                     else:
@@ -150,6 +154,7 @@ class SnowManModel:
                                        height,
                                        random.randint(min_x, max_x),
                                        0,
+                                       vx,
                                        g_babsoner_vy,
                                        False)
                     break
@@ -180,11 +185,12 @@ class SnowMan:
 
 class Babsoner:
     """ Encodes state of babsoner """
-    def __init__(self, width, height, x, y, vy, is_visible, is_pink):
+    def __init__(self, width, height, x, y, vx, vy, is_visible, is_pink):
         self.width = width
         self.height = height
         self.x = x
         self.y = y
+        self.vx = vx
         self.vy = vy
         self.is_visible = is_visible
         self.is_pink = is_pink
@@ -207,8 +213,8 @@ class Babsoner:
         alpha = 255
         self.image.fill((211, 242, 241, alpha), None, pygame.BLEND_RGBA_MULT)
 
-    def reset(self, width, height, x, y, vy, is_pink):
-        self.__init__(width, height, x, y, vy, True, is_pink)
+    def reset(self, width, height, x, y, vx, vy, is_pink):
+        self.__init__(width, height, x, y, vx, vy, True, is_pink)
 
 ############################################################################
 # View Classes
@@ -351,6 +357,7 @@ class SnowManBabsonerController:
     def update(self):
         """ """
         for babsoner in self.model.babsoners:
+            babsoner.x += babsoner.vx
             babsoner.y += babsoner.vy
             if babsoner.y > g_screen_height and babsoner.is_visible == True:
                 global g_num_rmvd_babsoners
