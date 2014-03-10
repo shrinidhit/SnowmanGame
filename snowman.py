@@ -195,6 +195,7 @@ class SnowManView:
             screen.blit(movie_screen,(0,0))
             pygame.display.update()
             clock.tick(FPS)
+            
 class SnowManPreview:
     """ Pre-game sequence """
     def __init__(self, model, screen):
