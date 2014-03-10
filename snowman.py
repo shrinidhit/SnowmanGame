@@ -38,13 +38,13 @@ g_screen_height = 640
 g_snowman_width = 50
 g_snowman_height = 100
 g_snowman_vx = 0
-g_snowman_lives = 6
+g_snowman_lives = 5 
 
 g_babsoner_width = 60
 g_babsoner_height = 45
 g_babsoner_vy = 5
 
-g_babsoner_vy_increase = 0.8
+g_babsoner_vy_increase = 0.6
 g_babsoner_vy_max = 17
 g_babsoner_vy_pink_factor = 1.3
 g_babsoner_magnify_max = 150    # percentile
@@ -378,6 +378,33 @@ def playMusic(loop,start):
 
 def stopMusic():
     pygame.mixer.music.stop()
+    
+def pauseMusic():
+    pygame.mixer.music.pause()
+
+def musicChanger():
+    if g_level % 10 == 1:
+        stopMusic()
+        pygame.mixer.music.load('jamesbond.mp3')
+        playMusic(-1,0.0)
+        jamestime = pygame.mixer.music.get_pos()
+    if g_level % 10 == 6:
+        stopMusic()
+        pygame.mixer.music.load('pinkpanther.mp3')
+        playMusic(-1,0.0)
+        panthertime = pygame.mixer.music.get_pos()
+    if g_level % 10 == range(2,6):
+        pygame.mixer.music.load('jamesbond.mp3')
+        pygame.mixer.music.set_pos(jamestime)
+        playMusic(-1,jamestime)
+        newtime = pygame.mixer.music.get_pos()
+        jamestime += newtime
+    if g_level % 10 == range(6,11):
+        pygame.mixer.music.load('pinkpanther.mp3')
+        pygame.mixer.music.set_pos(panthertime)
+        playMusic(-1,panthertime)
+        newwtime = pygame.mixer.music.get_pos()
+        panthertime += newwtime
 
 ############################################################################
 # Main
@@ -439,9 +466,11 @@ if __name__ == "__main__":
             if event.type == USEREVENT + 2:
                 if create_checker % g_create_checker_list[g_level] == 0:
                     controller_babsoner.create()
-                create_checker += 1
-                if create_checker > g_create_checker_list_max:
-                    create_checker = 1
+                    create_check = 1
+                else:
+                    create_checker += 1
+                    if create_checker > g_create_checker_list_max:
+                        create_checker = 1
                 print create_checker
 
             if event.type == USEREVENT + 3:
@@ -449,7 +478,8 @@ if __name__ == "__main__":
                     g_babsoner_vy += g_babsoner_vy_increase
                 if g_level < g_max_level:
                     g_level += 1
-                print "Level UP!"
+                    print "Level UP!"
+                musicChanger()
         view.draw()
         time.sleep(.001)
 
