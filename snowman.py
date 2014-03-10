@@ -176,8 +176,8 @@ class SnowManView:
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
         pygame.display.flip()
-    
-    def play_Movie(self):
+
+    def playMovie(self):
         FPS = 60
         clock = pygame.time.Clock()
         movie = pygame.movie.Movie('real_wreckingball.mpg')
@@ -277,10 +277,10 @@ class SnowManCollisionController:
 # Add Music
 ############################################################################
 
-def play_music(loop,start):
+def playMusic(loop,start):
     pygame.mixer.music.play(loop,start)
 
-def stop_music():
+def stopMusic():
     pygame.mixer.music.stop()
 
 ############################################################################
@@ -327,10 +327,10 @@ if __name__ == "__main__":
 
     #load video
     #movie = pygame.movie.Movie('real_wreckingball.mpg')
-    
+
     # Running loop
     running = True
-    play_music(-1,0.0)
+    playMusic(-1,0.0)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -359,8 +359,8 @@ if __name__ == "__main__":
             # Add code for video here!
             pygame.mixer.quit()
     #Printing score:
-    
+
     #Playing wrecking ball movie:
-    view.play_Movie()
+    view.playMovie()
     #Ending Game:
     pygame.quit()
