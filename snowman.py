@@ -32,14 +32,28 @@ import sys, traceback
 # Global variabless
 ############################################################################
 
+# File paths
+g_snowman_path = "./image/snowman.png"
+g_babsoner_path = "./image/babsoner.png"
+g_babsoner_flip_path = "./image/babsoner_flip.png"
+g_babsoner_pink_path = "./image/babsoner_pink.png"
+g_babsoner_pink_flip_path = "./image/babsoner_pink_flip.png"
+
+g_wreck_video_path = "./video/wreck_edit_use.mpg"
+g_music_jamesbond_path = "./music/jamesbond.mp3"
+g_music_pinkpanther_path = "./music/pinkpanther.mp3"
+
+# Screen
 g_screen_width = 640
 g_screen_height = 640
 
+# Snowman
 g_snowman_width = 50
 g_snowman_height = 100
 g_snowman_vx = 0
-g_snowman_lives = 5 
+g_snowman_lives = 5
 
+# Bansoner
 g_babsoner_width = 60
 g_babsoner_height = 45
 g_babsoner_vy = 5
@@ -51,15 +65,16 @@ g_babsoner_magnify_max = 150    # percentile
 
 g_max_babsoner = 10
 g_num_rmvd_babsoners = 0
+
+# Global variables
 g_time = 0
 g_level = 1
-
 g_max_level = 20
 # create is invoked every 50ms so if 10, 10*50ms = 500ms
 g_create_checker_list = [
-    15, 14, 13, 12, 11, 10,  9,  8,  7,  7,
-     6,  6,  5,  5,  4,  4,  3,  3,  2,  2,
-     1
+    20, 20, 19, 18, 17, 16, 15, 14, 13, 12,
+    11, 10,  9,  8,  7,  7,  6,  6,  6,  5,
+     4
 ]
 g_create_checker_list_max = max(g_create_checker_list)
 
@@ -151,7 +166,7 @@ class SnowMan:
         self.y = y
         self.vx = vx
         self.lives = lives
-        self.image = pygame.transform.scale(pygame.image.load("./snowman.png"), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
 
     def printAll(self):
         print "== Snowman =="
@@ -178,14 +193,14 @@ class Babsoner:
         image = None
         if is_pink:
             if r == 0:
-                image = pygame.image.load("./babsoner_pink_flip.png")
+                image = pygame.image.load(g_babsoner_pink_flip_path)
             else:
-                image = pygame.image.load("./babsoner_pink.png")
+                image = pygame.image.load(g_babsoner_pink_path)
         else:
             if r == 0:
-                image = pygame.image.load("./babsoner_flip.png")
+                image = pygame.image.load(g_babsoner_flip_path)
             else:
-                image = pygame.image.load("./babsoner.png")
+                image = pygame.image.load(g_babsoner_path)
 
         self.image = pygame.transform.scale(image, (self.width, self.height))
         # Make image transparent
@@ -253,7 +268,7 @@ class SnowManView:
         """ """
         FPS = 60
         clock = pygame.time.Clock()
-        movie = pygame.movie.Movie('wreck_edit_use.mpg')
+        movie = pygame.movie.Movie(g_wreck_video_path)
         movie.skip(41.5)
         size = (g_screen_width, g_screen_height)
         screen = pygame.display.set_mode(size)
@@ -378,29 +393,29 @@ def playMusic(loop,start):
 
 def stopMusic():
     pygame.mixer.music.stop()
-    
+
 def pauseMusic():
     pygame.mixer.music.pause()
 
 def musicChanger():
     if g_level % 10 == 1:
         stopMusic()
-        pygame.mixer.music.load('jamesbond.mp3')
+        pygame.mixer.music.load(g_music_jamesbond_path)
         playMusic(-1,0.0)
         jamestime = pygame.mixer.music.get_pos()
     if g_level % 10 == 6:
         stopMusic()
-        pygame.mixer.music.load('pinkpanther.mp3')
+        pygame.mixer.music.load(g_music_pinkpanther_path)
         playMusic(-1,0.0)
         panthertime = pygame.mixer.music.get_pos()
     if g_level % 10 == range(2,6):
-        pygame.mixer.music.load('jamesbond.mp3')
+        pygame.mixer.music.load(g_music_jamesbond_path)
         pygame.mixer.music.set_pos(jamestime)
         playMusic(-1,jamestime)
         newtime = pygame.mixer.music.get_pos()
         jamestime += newtime
     if g_level % 10 == range(6,11):
-        pygame.mixer.music.load('pinkpanther.mp3')
+        pygame.mixer.music.load(g_music_pinkpanther_path)
         pygame.mixer.music.set_pos(panthertime)
         playMusic(-1,panthertime)
         newwtime = pygame.mixer.music.get_pos()
@@ -426,7 +441,7 @@ if __name__ == "__main__":
     controller_collision = SnowManCollisionController(model)
 
     # Play music
-    pygame.mixer.music.load('jamesbond.mp3')
+    pygame.mixer.music.load(g_music_jamesbond_path)
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
     playMusic(-1,0.0)
 
@@ -466,7 +481,7 @@ if __name__ == "__main__":
             if event.type == USEREVENT + 2:
                 if create_checker % g_create_checker_list[g_level] == 0:
                     controller_babsoner.create()
-                    create_check = 1
+                    create_checker = 1
                 else:
                     create_checker += 1
                     if create_checker > g_create_checker_list_max:
