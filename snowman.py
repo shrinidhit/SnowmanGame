@@ -94,7 +94,6 @@ class SnowManModel:
                                g_snowman_vx,
                                g_snowman_lives)
         self.score = 0
-        self.snowman.printAll()
 
     def createBabsoner(self, vy):
         if len(self.babsoners) < g_max_babsoner:
@@ -106,7 +105,6 @@ class SnowManModel:
                               True,
                               False)
             self.babsoners.append(babson)
-            print "Babsoner Created! - %d" % (len(self.babsoners))
         else:
             for babsoner in self.babsoners:
                 if babsoner.is_visible == False:
@@ -168,16 +166,6 @@ class SnowMan:
         self.lives = lives
         self.image = pygame.transform.scale(pygame.image.load(g_snowman_path), (self.width, self.height))
 
-    def printAll(self):
-        print "== Snowman =="
-        print "width:", self.width
-        print "height:", self.height
-        print "x:", self.x
-        print "y:", self.y
-        print "vx:", self.vx
-        print "lives:", self.lives
-        print "============="
-
 class Babsoner:
     """ Encodes state of babsoner """
     def __init__(self, width, height, x, y, vy, is_visible, is_pink):
@@ -238,11 +226,9 @@ class SnowManView:
         # Displaying Babsoners
         for babsoner in self.model.babsoners:
             if babsoner.is_visible == True:
-                #print "Babsoner Displayed!"
                 try:
                     screen.blit(babsoner.image, (babsoner.x, babsoner.y))
                 except:
-                    print "x: %d / y: %d", (babsoner.x, babsoner.y)
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
         pygame.display.flip()
@@ -283,8 +269,6 @@ class SnowManView:
                 if event.type == pygame.QUIT:
                     movie.stop()
                     playing = False
-            #print 'current:' + str(movie.get_time())
-            #print 'total:' + str(movie.get_length())
             if movie.get_time() >= movie.get_length() - 42:
                 movie.stop()
                 playing = False
@@ -382,7 +366,6 @@ class SnowManCollisionController:
                         model.snowman.lives -= 1
 
                     babsoner.is_visible = False
-                    print "Collision! - remaining lives: %d" % (model.snowman.lives)
 
 class SnowManMusicController:
     def __init__(self):
@@ -492,14 +475,12 @@ if __name__ == "__main__":
                     create_checker += 1
                     if create_checker > g_create_checker_list_max:
                         create_checker = 1
-                #print create_checker
 
             if event.type == USEREVENT + 3:
                 if g_babsoner_vy < g_babsoner_vy_max:
                     g_babsoner_vy += g_babsoner_vy_increase
                 if g_level < g_max_level:
                     g_level += 1
-                    print "Level UP!"
                 controller_music.changeMusisc()
         view.draw()
         time.sleep(.001)
