@@ -85,6 +85,8 @@ class SnowManModel:
         else:
             for babsoner in self.babsoners:
                 if babsoner.is_visible == False:
+                    r_pink = random.randint(0, 7)
+
                     # Width and height are generated randomly if level >= 3
                     width = g_babsoner_width
                     height = g_babsoner_height
@@ -94,20 +96,24 @@ class SnowManModel:
                             r = (g_babsoner_magnify_max) if (r > g_babsoner_magnify_max) else (r)
                             width = int(width * float(r / 100.0))
                             height = int(height * float(r / 100.0))
-                    #print width, height
+
                     # X coordinate is generated randomly but centered to current location of snowman
-                    min_x = model.snowman.x - int(g_screen_width / 3.0)
-                    max_x = model.snowman.x + int(g_screen_width / 3.0)
+                    if r_pink == 0:
+                        # Pink one is coming much closer!
+                        min_x = model.snowman.x - int(g_screen_width / 6.0)
+                        max_x = model.snowman.x + int(g_screen_width / 6.0)
+                    else:
+                        min_x = model.snowman.x - int(g_screen_width / 3.0)
+                        max_x = model.snowman.x + int(g_screen_width / 3.0)
                     if min_x < 0:
                         max_x += -(min_x)
                         min_x = 0
                     if max_x > g_screen_width - width:
                         min_x -= max_x - (g_screen_width - width)
                         max_x = g_screen_width - width
-                    #print max_x - min_x
+
                     # Reset babsoner
-                    r = random.randint(0, 7)
-                    if r == 0:  # Pink!
+                    if r_pink == 0:  # Pink!
                         babsoner.reset(width,
                                        height,
                                        random.randint(min_x, max_x),
@@ -215,7 +221,7 @@ class SnowManView:
                     traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
         pygame.display.flip()
-        
+
     def score_Chart(self):
         # Filling Background Color
         size = (g_screen_width, g_screen_height)
@@ -370,14 +376,16 @@ if __name__ == "__main__":
     controller_mouse = SnowManMouseController(model)
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
-    
-    # Create timer event for preview
-    pygame.time.set_timer(USEREVENT + 1, 1000)
-     #play music
+
+    # Play music
     pygame.mixer.music.load('jamesbond.mp3')
     pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
     playMusic(-1,0.0)
-    #Preview:
+
+    # Create timer event for preview
+    pygame.time.set_timer(USEREVENT + 1, 1000)
+
+    # Preview
     while g_time < 5:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -387,15 +395,10 @@ if __name__ == "__main__":
                 g_time += 1
         preview.draw()
 
-    # Create timer event for user event
+    # Create timer event for user events
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 800)
-    pygame.time.set_timer(USEREVENT + 3, 8000)    # every 8 seconds
-
-   
-
-    #load video
-    #movie = pygame.movie.Movie('real_wreckingball.mpg')
+    pygame.time.set_timer(USEREVENT + 3, 7000)    # every 8 seconds
 
     # Running loop
     running = True
@@ -418,22 +421,23 @@ if __name__ == "__main__":
                 if g_babsoner_vy < g_babsoner_vy_max:
                     g_babsoner_vy += g_babsoner_vy_increase
                 g_level += 1
-                print "Speed UP!"
+                print "Level UP!"
         view.draw()
         time.sleep(.001)
 
         if model.snowman.lives <= 0:
             running = False
-            # Add code for video here!
             pygame.mixer.quit()
-    #Playing wrecking ball movie:
+
+    # Playi wrecking ball movie
     view.playMovie()
-    #printing score:
+
+    # Printing score
     chart_showing = True
     while chart_showing:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 chart_showing = False
         view.score_Chart()
-    #Ending Game:
+
     pygame.quit()
