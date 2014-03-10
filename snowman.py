@@ -269,6 +269,9 @@ def stop_music():
 # Main
 ############################################################################
 
+def exitGame():
+    pass
+
 if __name__ == "__main__":
     pygame.init()
 
@@ -284,11 +287,22 @@ if __name__ == "__main__":
     controller_babsoner = SnowManBabsonerController(model)
     controller_collision = SnowManCollisionController(model)
 
+    # Create timer event for preview
+    pygame.time.set_timer(USEREVENT + 1, 1000)
+    while g_time < 5:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                exitGame()
+                sys.exit(0)
+
+            if event.type == USEREVENT + 1:
+                g_time += 1
+        preview.draw()
+
     # Create timer event for user event
     pygame.time.set_timer(USEREVENT + 1, 50)
     pygame.time.set_timer(USEREVENT + 2, 800)
     pygame.time.set_timer(USEREVENT + 3, 8000)    # every 8 seconds
-    pygame.time.set_timer(USEREVENT + 4, 1000)    # every 1 second
 
     #load music
     pygame.mixer.music.load('jamesbond.mp3')
@@ -306,34 +320,26 @@ if __name__ == "__main__":
     running = True
     play_music(-1,0.0)
     while running:
-        global g_time
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
 
-            if event.type == MOUSEMOTION and g_time >= 5:
+            if event.type == MOUSEMOTION:
                 controller_mouse.handleMouseEvent(event)
 
-            if event.type == USEREVENT + 1 and g_time >= 5:
+            if event.type == USEREVENT + 1:
                 controller_babsoner.update()
                 controller_collision.check()
 
-            if event.type == USEREVENT + 2 and g_time >= 5:
+            if event.type == USEREVENT + 2:
                 controller_babsoner.create()
 
-            if event.type == USEREVENT + 3 and g_time >= 5:
+            if event.type == USEREVENT + 3:
                 g_babsoner_vy += 2
                 g_level += 1
                 print "Speed UP!"
 
-            if event.type == USEREVENT + 4 and g_time < 5:
-                g_time += 1
-
-        if g_time < 5:
-            preview.draw()
-        else:
-            view.draw()
-
+        view.draw()
         time.sleep(.001)
 
         if model.snowman.lives <= 0:
