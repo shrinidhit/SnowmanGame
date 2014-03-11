@@ -43,6 +43,7 @@ g_babsoner_pink_flip_path = "./image/babsoner_pink_flip.png"
 g_wreck_video_path = "./video/wreck_edit_use.mpg"
 g_music_jamesbond_path = "./music/jamesbond.mp3"
 g_music_pinkpanther_path = "./music/pinkpanther.mp3"
+g_hit_sound_path = "./music/hit_sound.wav"
 
 # Screen
 g_screen_width = 640
@@ -407,13 +408,16 @@ class SnowManCollisionController:
                         if model.snowman.state != g_snowman_state_half:
                             model.snowman.transform(g_snowman_state_half)
                     babsoner.is_visible = False
+                    controller_music.playHitSound()
 
 class SnowManMusicController:
     def __init__(self):
-        self.jamesbond = None
-        self.pinkpanther = None
         pygame.mixer.music.load(g_music_jamesbond_path)
         pygame.mixer.music.set_volume(1.0) #value between 0.0 and 1.0
+        self.hit_sound = pygame.mixer.Sound(g_hit_sound_path)
+
+    def playHitSound(self):
+        self.hit_sound.play()
 
     def playMusic(self, loop,start):
         pygame.mixer.music.play(loop, start)
@@ -424,7 +428,7 @@ class SnowManMusicController:
     def pauseMusic(self):
         pygame.mixer.music.pause()
 
-    def changeMusisc(self):
+    def changeMusic(self):
         if g_level % 10 == 1:
             self.stopMusic()
             pygame.mixer.music.load(g_music_jamesbond_path)
@@ -522,7 +526,7 @@ if __name__ == "__main__":
                     g_babsoner_vy += g_babsoner_vy_increase
                 if g_level < g_max_level:
                     g_level += 1
-                controller_music.changeMusisc()
+                controller_music.changeMusic()
         view.draw()
         time.sleep(.001)
 
